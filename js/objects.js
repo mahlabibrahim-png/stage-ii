@@ -437,86 +437,109 @@
       return g;
     },
 
-    // 35mm film SLR: chrome top and base plates, black leatherette, prism hump, knurled lens with aperture scale.
-    camera({ M, MT, part, rbox, tex, noise }) {
+    // Vintage movie camera: black crinkle body, twin chrome reels on top, lens with hood, side crank, eyepiece, pistol grip.
+    camera({ M, MT, part, rbox, tex, noise, tube }) {
       const g = new T.Group();
-      const chrome = M('#d9dadc', { m: 1, r: 0.18 }), satin = M('#b9bbbe', { m: 1, r: 0.35 });
-      const black = M('#121212', { r: 0.35, cc: 0.4 }), rubber = M('#0c0c0c', { r: 0.75 });
-      const leather = MT({ color: '#151515', roughness: 0.85, bumpMap: noise(256, 256, 60, 200), bumpScale: 0.006 });
-      const ALONG_Z = [Math.PI / 2, 0, 0];
-      // body: leatherette core, chrome top and base plates
-      g.add(part(new T.BoxGeometry(1.44, 0.46, 0.4), leather, [0, -0.02, 0]));
-      g.add(part(rbox(1.46, 0.12, 0.42, 0.04), chrome, [0, 0.26, 0]));
-      g.add(part(rbox(1.46, 0.07, 0.42, 0.03), chrome, [0, -0.28, 0]));
-      // pentaprism hump
-      const hump = new T.Shape();
-      hump.moveTo(-0.3, 0); hump.lineTo(0.3, 0); hump.lineTo(0.17, 0.27); hump.lineTo(-0.17, 0.27); hump.lineTo(-0.3, 0);
-      const hg = new T.ExtrudeGeometry(hump, { depth: 0.3, bevelEnabled: true, bevelSize: 0.02, bevelThickness: 0.02, bevelSegments: 3 });
-      hg.translate(0, 0, -0.15);
-      g.add(part(hg, chrome, [0, 0.31, -0.02]));
-      g.add(part(new T.BoxGeometry(0.26, 0.09, 0.012), black, [0, 0.43, 0.15], [-0.42, 0, 0])); // blank nameplate
-      g.add(part(new T.BoxGeometry(0.2, 0.06, 0.012), black, [0, 0.47, -0.19])); // prism back
-      // eyepiece
-      g.add(part(rbox(0.2, 0.15, 0.08, 0.03), rubber, [0, 0.4, -0.22]));
-      g.add(part(new T.BoxGeometry(0.12, 0.08, 0.01), M('#1a2230', { r: 0.05, cc: 1 }), [0, 0.4, -0.262]));
-      // lens: mount, barrel, focus ring (knurled), aperture ring (scale), front ring and glass
-      const lz = 0.2;
-      g.add(part(new T.CylinderGeometry(0.29, 0.29, 0.06, 64), chrome, [0, -0.02, lz + 0.03], ALONG_Z));
-      g.add(part(new T.CylinderGeometry(0.255, 0.27, 0.08, 64), black, [0, -0.02, lz + 0.1], ALONG_Z));
-      const scale = tex(1024, 64, (x, w, h) => {
-        x.fillStyle = '#e9e9e9'; x.fillRect(0, 0, w, h);
-        x.fillStyle = '#111'; x.font = '600 30px Arial'; x.textAlign = 'center';
-        const f = ['2', '2.8', '4', '5.6', '8', '11', '16', '22'];
-        f.forEach((s, i) => x.fillText(s, (i + 0.5) * (w / 2) / f.length, 44));
-        f.forEach((s, i) => x.fillText(s, w / 2 + (i + 0.5) * (w / 2) / f.length, 44));
-      });
-      g.add(part(new T.CylinderGeometry(0.26, 0.26, 0.06, 64, 1, true), MT({ map: scale, metalness: 0.6, roughness: 0.3 }), [0, -0.02, lz + 0.17], ALONG_Z));
-      const knurl = tex(512, 16, (x, w, h) => { for (let i = 0; i < w; i += 8) { x.fillStyle = '#fff'; x.fillRect(i, 0, 4, h); x.fillStyle = '#000'; x.fillRect(i + 4, 0, 4, h); } }, false);
-      g.add(part(new T.CylinderGeometry(0.27, 0.27, 0.13, 96), MT({ color: '#141414', roughness: 0.55, bumpMap: knurl, bumpScale: 0.02 }), [0, -0.02, lz + 0.265], ALONG_Z));
-      const dist = tex(1024, 48, (x, w, h) => {
-        x.fillStyle = '#d9dadc'; x.fillRect(0, 0, w, h); x.fillStyle = '#222'; x.font = '24px Arial'; x.textAlign = 'center';
-        ['∞', '10', '5', '3', '2', '1.5', '1', '.7', '.5', '.45'].forEach((s, i) => x.fillText(s, (i + 0.5) * w / 10, 32));
-      });
-      g.add(part(new T.CylinderGeometry(0.25, 0.25, 0.05, 64, 1, true), MT({ map: dist, metalness: 0.7, roughness: 0.25 }), [0, -0.02, lz + 0.355], ALONG_Z));
-      g.add(part(new T.CylinderGeometry(0.24, 0.25, 0.05, 64, 1, true), M('#121212', { r: 0.35, cc: 0.4, ds: 1 }), [0, -0.02, lz + 0.405], ALONG_Z));
-      g.add(part(new T.TorusGeometry(0.205, 0.018, 12, 64), satin, [0, -0.02, lz + 0.43]));
-      const glass = MT({ color: '#5a4a86', metalness: 0.85, roughness: 0.06, clearcoat: 1, clearcoatRoughness: 0.02, envMapIntensity: 1.8 });
-      const lens = new T.Mesh(new T.SphereGeometry(0.3, 48, 24, 0, Math.PI * 2, 0, 0.72), glass);
-      lens.rotation.x = Math.PI / 2; lens.position.set(0, -0.02, lz + 0.235); lens.scale.set(1, 0.6, 1);
-      g.add(lens);
-      g.add(part(new T.CylinderGeometry(0.07, 0.07, 0.01, 32), M('#3a2a5a', { m: 0.5, r: 0.05, cc: 1 }), [0, -0.02, lz + 0.39], ALONG_Z));
-      // top controls: shutter dial, release button, advance lever, rewind knob and crank
-      const dialTop = tex(128, 128, (x, w, h) => {
-        x.fillStyle = '#cfd0d2'; x.fillRect(0, 0, w, h); x.fillStyle = '#111'; x.font = '600 11px Arial'; x.textAlign = 'center';
-        ['B', '1', '2', '4', '8', '15', '30', '60', '125', '250', '500', '1000'].forEach((s, i) => {
-          const a = (i / 12) * Math.PI * 2; x.fillText(s, 64 + Math.sin(a) * 46, 68 - Math.cos(a) * 46);
-        });
-      });
-      const dialMats = [MT({ color: '#c9cacc', metalness: 1, roughness: 0.3, bumpMap: knurl, bumpScale: 0.01 }), MT({ map: dialTop, metalness: 0.5, roughness: 0.35 }), chrome];
-      g.add(part(new T.CylinderGeometry(0.13, 0.13, 0.07, 48), dialMats, [0.42, 0.355, 0.02]));
-      g.add(part(new T.CylinderGeometry(0.035, 0.04, 0.05, 24), chrome, [0.42, 0.41, 0.02]));
-      g.add(part(new T.CylinderGeometry(0.05, 0.05, 0.035, 24), chrome, [0.6, 0.34, 0.1]));
-      g.add(part(new T.CylinderGeometry(0.025, 0.025, 0.02, 16), black, [0.6, 0.365, 0.1]));
-      g.add(part(new T.CylinderGeometry(0.06, 0.06, 0.03, 24), chrome, [0.56, 0.335, -0.12]));
-      g.add(part(new T.BoxGeometry(0.34, 0.016, 0.06), chrome, [0.46, 0.355, -0.24], [0, 0.55, 0]));
-      g.add(part(new T.BoxGeometry(0.1, 0.03, 0.065), black, [0.33, 0.355, -0.34], [0, 0.55, 0]));
-      g.add(part(new T.CylinderGeometry(0.11, 0.11, 0.08, 48), dialMats[0], [-0.48, 0.36, 0.02]));
-      g.add(part(new T.CylinderGeometry(0.11, 0.11, 0.012, 48), chrome, [-0.48, 0.405, 0.02]));
-      g.add(part(new T.BoxGeometry(0.16, 0.012, 0.035), satin, [-0.42, 0.418, 0.02], [0, 0.4, 0]));
-      g.add(part(new T.CylinderGeometry(0.012, 0.012, 0.05, 10), black, [-0.36, 0.44, 0.07]));
-      // hot shoe on the prism
-      g.add(part(new T.BoxGeometry(0.16, 0.02, 0.16), satin, [0, 0.6, -0.02]));
-      // front details: self-timer lever, depth-of-field button, strap lugs
-      g.add(part(new T.BoxGeometry(0.04, 0.13, 0.02), chrome, [-0.42, 0.06, 0.215], [0, 0, 0.3]));
-      g.add(part(new T.CylinderGeometry(0.03, 0.03, 0.025, 20), chrome, [0.38, 0.1, 0.212], ALONG_Z));
-      for (const s of [-1, 1]) {
-        g.add(part(new T.CylinderGeometry(0.03, 0.03, 0.04, 16), chrome, [s * 0.74, 0.16, 0], [0, 0, Math.PI / 2]));
-        g.add(part(new T.TorusGeometry(0.04, 0.01, 8, 20), chrome, [s * 0.78, 0.16, 0], [0, Math.PI / 2, 0]));
+      const chrome = M('#dcdde0', { m: 1, r: 0.16 }), satin = M('#b4b6ba', { m: 1, r: 0.35 });
+      const black = M('#111', { r: 0.35, cc: 0.4 }), rubber = M('#0b0b0b', { r: 0.8 });
+      const crinkle = MT({ color: '#161616', roughness: 0.7, bumpMap: noise(256, 256, 40, 220), bumpScale: 0.01 });
+      const ALONG_Z = [Math.PI / 2, 0, 0], ALONG_X = [0, 0, Math.PI / 2];
+      // body (lens points +z)
+      g.add(part(rbox(0.5, 0.62, 1.0, 0.06), crinkle, [0, 0, 0]));
+      g.add(part(rbox(0.52, 0.06, 1.02, 0.02), satin, [0, 0.31, 0]));
+      g.add(part(rbox(0.04, 0.42, 0.7, 0.02), satin, [0.265, 0, 0])); // film door plate
+      for (const z of [-0.25, 0.25]) g.add(part(new T.CylinderGeometry(0.03, 0.03, 0.02, 16), chrome, [0.29, 0.13, z], ALONG_X));
+      // twin reels on top, each a chrome disc with three cut-outs, on its own spindle
+      const reels = [];
+      const reelShape = () => {
+        const s = new T.Shape(); s.absarc(0, 0, 0.36, 0, Math.PI * 2, false);
+        for (let i = 0; i < 3; i++) {
+          const a = (i / 3) * Math.PI * 2, h = new T.Path();
+          h.absarc(Math.cos(a) * 0.2, Math.sin(a) * 0.2, 0.1, 0, Math.PI * 2, true); s.holes.push(h);
+        }
+        const hub = new T.Path(); hub.absarc(0, 0, 0.03, 0, Math.PI * 2, true); s.holes.push(hub);
+        const geo = new T.ExtrudeGeometry(s, { depth: 0.025, bevelEnabled: true, bevelSize: 0.006, bevelThickness: 0.006, bevelSegments: 2, curveSegments: 48 });
+        geo.translate(0, 0, -0.0125); geo.rotateY(Math.PI / 2);
+        return geo;
+      };
+      for (const z of [0.24, -0.3]) {
+        const r = new T.Group(); r.position.set(0, 0.74, z);
+        for (const x of [-0.07, 0.07]) r.add(part(reelShape(), chrome, [x, 0, 0]));
+        r.add(part(new T.CylinderGeometry(0.33, 0.33, 0.12, 48), MT({ color: '#2a1f17', roughness: 0.45, clearcoat: 0.6 }), [0, 0, 0], ALONG_X)); // wound film
+        r.add(part(new T.CylinderGeometry(0.06, 0.06, 0.2, 20), black, [0, 0, 0], ALONG_X));
+        g.add(r); reels.push(r);
+        g.add(part(rbox(0.1, 0.4, 0.12, 0.03), black, [0, 0.5, z])); // reel arm
       }
-      // film rewind / back door seam and tripod socket
-      g.add(part(new T.BoxGeometry(1.44, 0.006, 0.006), M('#050505'), [0, -0.235, -0.2]));
-      g.add(part(new T.CylinderGeometry(0.035, 0.035, 0.01, 20), satin, [0, -0.318, 0]));
-      g.userData.tilt = 0.18;
+      // film strip running from the reels into the body
+      const film = M('#1c140e', { r: 0.4, cc: 0.5, ds: 1 });
+      g.add(part(new T.BoxGeometry(0.1, 0.006, 0.5), film, [0, 0.43, 0.08], [0.9, 0, 0]));
+      g.add(part(new T.BoxGeometry(0.1, 0.006, 0.45), film, [0, 0.45, -0.12], [-0.95, 0, 0]));
+      // lens: mount, barrel with focus ring, coated glass, square hood
+      const lz = 0.5;
+      g.add(part(new T.CylinderGeometry(0.17, 0.17, 0.05, 48), chrome, [0, -0.02, lz + 0.025], ALONG_Z));
+      g.add(part(new T.CylinderGeometry(0.14, 0.15, 0.22, 48), black, [0, -0.02, lz + 0.15], ALONG_Z));
+      const knurl = tex(512, 16, (x, w, h) => { for (let i = 0; i < w; i += 8) { x.fillStyle = '#fff'; x.fillRect(i, 0, 4, h); x.fillStyle = '#000'; x.fillRect(i + 4, 0, 4, h); } }, false);
+      g.add(part(new T.CylinderGeometry(0.16, 0.16, 0.08, 72), MT({ color: '#c9cacc', metalness: 1, roughness: 0.3, bumpMap: knurl, bumpScale: 0.015 }), [0, -0.02, lz + 0.16], ALONG_Z));
+      const hood = new T.CylinderGeometry(0.2, 0.15, 0.14, 4, 1, true); hood.rotateY(Math.PI / 4);
+      g.add(part(hood, M('#121212', { r: 0.5, ds: 1 }), [0, -0.02, lz + 0.33], ALONG_Z));
+      const glass = MT({ color: '#5a4a86', metalness: 0.85, roughness: 0.06, clearcoat: 1, clearcoatRoughness: 0.02, envMapIntensity: 1.8 });
+      const lens = new T.Mesh(new T.SphereGeometry(0.16, 40, 20, 0, Math.PI * 2, 0, 0.9), glass);
+      lens.rotation.x = Math.PI / 2; lens.position.set(0, -0.02, lz + 0.21); lens.scale.set(1, 0.5, 1); g.add(lens);
+      // viewfinder tube along the left side with rubber eyecup at the back
+      g.add(part(new T.CylinderGeometry(0.06, 0.06, 0.9, 32), satin, [-0.31, 0.16, -0.05], ALONG_Z));
+      g.add(part(new T.CylinderGeometry(0.075, 0.075, 0.06, 32), chrome, [-0.31, 0.16, 0.42], ALONG_Z));
+      g.add(part(new T.CylinderGeometry(0.11, 0.08, 0.12, 32, 1, true), M('#0b0b0b', { r: 0.8, ds: 1 }), [-0.31, 0.16, -0.56], ALONG_Z));
+      for (const z of [-0.3, 0.25]) g.add(part(new T.BoxGeometry(0.08, 0.05, 0.05), satin, [-0.27, 0.16, z]));
+      // hand crank on the right side
+      const crank = new T.Group(); crank.position.set(0.3, -0.08, -0.15);
+      crank.add(part(new T.CylinderGeometry(0.06, 0.06, 0.04, 24), chrome, [0.02, 0, 0], ALONG_X));
+      crank.add(part(new T.BoxGeometry(0.025, 0.03, 0.24), chrome, [0.05, 0, -0.1]));
+      crank.add(part(new T.CylinderGeometry(0.025, 0.025, 0.1, 16), black, [0.1, 0, -0.21], ALONG_X));
+      g.add(crank);
+      // footage counter and speed dial on the left wall
+      const dial = tex(128, 128, (x, w, h) => {
+        x.fillStyle = '#e8e6df'; x.beginPath(); x.arc(64, 64, 62, 0, 7); x.fill(); x.fillStyle = '#111'; x.font = '600 14px Arial'; x.textAlign = 'center';
+        ['8', '16', '24', '32', '48', '64'].forEach((s, i) => { const a = -2.2 + i * 0.88; x.fillText(s, 64 + Math.sin(a) * 44, 70 - Math.cos(a) * 44); });
+        x.strokeStyle = '#b01e1e'; x.lineWidth = 3; x.beginPath(); x.moveTo(64, 64); x.lineTo(90, 36); x.stroke();
+      });
+      g.add(part(new T.CylinderGeometry(0.11, 0.11, 0.02, 40), [chrome, MT({ map: dial, roughness: 0.3, clearcoat: 1 }), chrome], [-0.26, -0.12, 0.15], [0, 0, -Math.PI / 2]));
+      // pistol grip and trigger underneath
+      g.add(part(rbox(0.16, 0.42, 0.18, 0.06), rubber, [0, -0.48, 0.1], [0.25, 0, 0]));
+      for (let i = 0; i < 4; i++) g.add(part(new T.BoxGeometry(0.17, 0.012, 0.03), black, [0, -0.36 - i * 0.08, 0.2 - i * 0.02], [0.25, 0, 0]));
+      g.add(part(new T.BoxGeometry(0.04, 0.08, 0.03), chrome, [0, -0.34, 0.24], [0.25, 0, 0]));
+      g.add(part(new T.CylinderGeometry(0.035, 0.035, 0.01, 20), satin, [0, -0.312, -0.3]));
+      g.userData.tilt = 0.12;
+      g.userData.tick = (t) => { reels.forEach((r) => { r.rotation.x = -t * 1.6; }); crank.rotation.x = -t * 1.6; };
+      return g;
+    },
+
+    // Montale-style metal flask perfume (Starry Nights): deep navy metallic bottle with tiny stars, silver collar, tall cap.
+    perfume({ M, MT, part, tex }) {
+      const g = new T.Group();
+      const stars = tex(1024, 512, (x, w, h) => {
+        const grad = x.createLinearGradient(0, 0, 0, h);
+        grad.addColorStop(0, '#2b2f73'); grad.addColorStop(0.55, '#16184a'); grad.addColorStop(1, '#0a0b26');
+        x.fillStyle = grad; x.fillRect(0, 0, w, h);
+        for (let i = 0; i < 420; i++) {
+          const px = Math.random() * w, py = Math.random() * h, r = Math.random() < 0.08 ? 2.4 : 0.6 + Math.random();
+          x.fillStyle = `rgba(235,235,255,${0.5 + Math.random() * 0.5})`; x.beginPath(); x.arc(px, py, r, 0, 7); x.fill();
+        }
+        // a few four-point sparkles
+        x.strokeStyle = 'rgba(255,255,255,0.9)'; x.lineWidth = 1.5;
+        for (let i = 0; i < 14; i++) { const px = Math.random() * w, py = Math.random() * h, s = 5 + Math.random() * 6; x.beginPath(); x.moveTo(px - s, py); x.lineTo(px + s, py); x.moveTo(px, py - s); x.lineTo(px, py + s); x.stroke(); }
+      });
+      const body = MT({ map: stars, metalness: 0.75, roughness: 0.22, clearcoat: 1, clearcoatRoughness: 0.05 });
+      const silver = M('#d8d9dc', { m: 1, r: 0.15 });
+      // body: lathe profile, flat base, soft shoulder, short neck
+      const prof = [[0, 0], [0.27, 0], [0.3, 0.02], [0.3, 0.9], [0.29, 0.95], [0.24, 1.0], [0.12, 1.03], [0.1, 1.06]].map(([r, y]) => new T.Vector2(r, y));
+      g.add(part(new T.LatheGeometry(prof, 96), body, [0, -0.7, 0]));
+      g.add(part(new T.CylinderGeometry(0.27, 0.27, 0.005, 64), M('#0c0d22', { m: 0.6, r: 0.3 }), [0, -0.7, 0]));
+      // silver collar, then the tall cap in the same starry finish with a silver top band
+      g.add(part(new T.CylinderGeometry(0.16, 0.16, 0.06, 64), silver, [0, 0.37, 0]));
+      g.add(part(new T.CylinderGeometry(0.2, 0.2, 0.36, 64), [body, silver, silver], [0, 0.58, 0]));
+      g.add(part(new T.CylinderGeometry(0.205, 0.205, 0.04, 64), silver, [0, 0.74, 0]));
+      g.add(part(new T.TorusGeometry(0.2, 0.012, 10, 64), silver, [0, 0.4, 0], [Math.PI / 2, 0, 0]));
+      g.userData.tilt = 0.12;
       return g;
     },
   };

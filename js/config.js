@@ -51,7 +51,7 @@ window.STAGE = {
       media: 6,
     },
     {
-      id: 'bilal', group: 'member', name: 'Bilo', object: 'tank', color: '#6fffc8',
+      id: 'bilal', group: 'member', name: 'Bilo', object: 'perfume', color: '#6fffc8',
       media: 6,
     },
   ],
