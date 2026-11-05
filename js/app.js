@@ -10,12 +10,33 @@
     const list = typeof t.media === 'number' ? Array.from({ length: t.media }, (_, i) => `${pad(i + 1)}.jpg`) : (t.media || []);
     return list.map((f, i) => {
       const file = typeof f === 'string' ? f : f.file;
-      return { tab: t, n: i + 1, src: /^(https?:)?\//.test(file) ? file : `photos/${t.id}/${file}`, video: VIDEO.test(file) };
+      return { tab: t, n: i + 1, file, src: srcOf(t, file), video: VIDEO.test(file) };
     });
   }
 
+  const srcOf = (t, file) => (/^(https?:)?\//.test(file) ? file : `photos/${t.id}/${file}`);
+
+  // videos in the list play (muted) while they're on screen
+  const inView = 'IntersectionObserver' in window ? new IntersectionObserver((es) => {
+    for (const e of es) { const v = e.target; if (e.isIntersecting) v.play().catch(() => {}); else v.pause(); }
+  }, { threshold: 0.35 }) : null;
+
+  /* ---------- entries: each photo/video after main, with room for text ---------- */
+  function entry(m, set) {
+    const a = document.createElement('article');
+    a.className = 'entry';
+    const f = frame(m, set, true);
+    const txt = document.createElement('div');
+    txt.className = 'entry-text';
+    const words = m.tab.text && m.tab.text[m.file];
+    if (words) txt.textContent = words;
+    else for (let i = 0; i < 3; i++) txt.append(Object.assign(document.createElement('span'), { className: 'ph' }));
+    a.append(f, txt);
+    return a;
+  }
+
   /* ---------- gallery frames ---------- */
-  function frame(m, set) {
+  function frame(m, set, natural) {
     const f = document.createElement('figure');
     f.className = 'frame';
     const slot = document.createElement('span');
@@ -28,8 +49,11 @@
       media = document.createElement('video');
       media.muted = true; media.loop = true; media.playsInline = true; media.preload = 'metadata';
       media.addEventListener('loadeddata', ready, { once: true });
-      f.addEventListener('pointerenter', () => media.play().catch(() => {}));
-      f.addEventListener('pointerleave', () => media.pause());
+      if (natural && inView) inView.observe(media);
+      else {
+        f.addEventListener('pointerenter', () => media.play().catch(() => {}));
+        f.addEventListener('pointerleave', () => media.pause());
+      }
       f.classList.add('is-video');
     } else {
       media = new Image();
@@ -103,6 +127,11 @@
   });
 
   /* ---------- views ---------- */
+  // the name and menu button turn white while a full-screen video/photo is behind them
+  const over = { hero: false, main: false };
+  let heroUpdate = () => {};
+  const paintHeader = () => document.body.classList.toggle('over-video', over.hero || over.main);
+
   function buildHero() {
     const hero = $('#hero'), v = $('#hero-video');
     if (!S.hero) { hero.hidden = true; return; }
@@ -118,11 +147,12 @@
       hero.style.setProperty('--zoom', String(1 + k * 0.08));
       const gone = k >= 1;
       hero.classList.toggle('gone', gone);
-      document.body.classList.toggle('over-video', !hero.hidden && !$('#view-home').hidden && k < 0.55);
+      over.hero = !hero.hidden && !$('#view-home').hidden && k < 0.55; paintHeader();
       if (gone) v.pause(); else if (v.paused && hero.classList.contains('loaded')) v.play().catch(() => {});
     };
     window.addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
     window.addEventListener('hashchange', () => requestAnimationFrame(update));
+    heroUpdate = update;
     update();
   }
 
@@ -134,12 +164,59 @@
     });
   }
 
+  /* main: fades in over the page, holds while you scroll, then slides up into the list */
+  const block = $('#main-block'), layer = $('#main-layer');
+  let mainMedia = null;
+  function fitMain() {
+    if (!mainMedia) return;
+    const w = mainMedia.videoWidth || mainMedia.naturalWidth, h = mainMedia.videoHeight || mainMedia.naturalHeight;
+    if (!w || !h) return;
+    const r = (w / h) / (window.innerWidth / window.innerHeight);
+    layer.classList.toggle('fit', r < 0.62 || r > 1.6); // very different shape from the screen: show it whole
+  }
+  function setMain(t) {
+    layer.innerHTML = ''; mainMedia = null;
+    block.hidden = !t || !t.main;
+    if (block.hidden) { updateMain(); return; }
+    const src = srcOf(t, t.main);
+    if (VIDEO.test(t.main)) {
+      const v = document.createElement('video');
+      v.muted = true; v.loop = true; v.playsInline = true; v.autoplay = false; v.preload = 'metadata';
+      v.addEventListener('loadedmetadata', fitMain);
+      v.src = src; mainMedia = v;
+    } else {
+      const i = new Image(); i.alt = ''; i.decoding = 'async';
+      i.addEventListener('load', fitMain);
+      i.src = src; mainMedia = i;
+    }
+    layer.append(mainMedia);
+    updateMain();
+  }
+  function updateMain() {
+    if (block.hidden || $('#view-tab').hidden) { layer.classList.remove('on'); over.main = false; paintHeader(); if (mainMedia && mainMedia.pause) mainMedia.pause(); return; }
+    const r = block.getBoundingClientRect(), vh = window.innerHeight;
+    // fade starts once you begin scrolling (or once the block nears the screen) and is complete when it reaches the top
+    const top = r.top + window.scrollY, s0 = Math.max(0, top - vh) + 24;
+    const op = Math.min(1, Math.max(0, (window.scrollY - s0) / Math.max(1, top - s0)));
+    const ty = Math.min(0, r.bottom - vh);
+    const on = op > 0 && r.bottom > 0;
+    layer.classList.toggle('on', on);
+    layer.style.opacity = String(op);
+    layer.style.transform = `translate3d(0, ${ty}px, 0)`;
+    over.main = op > 0.55 && r.bottom > 70; paintHeader();
+    if (mainMedia && mainMedia.play) { if (on && mainMedia.paused) mainMedia.play().catch(() => {}); else if (!on && !mainMedia.paused) mainMedia.pause(); }
+  }
+  let mTick = false;
+  window.addEventListener('scroll', () => { if (!mTick) { mTick = true; requestAnimationFrame(() => { mTick = false; updateMain(); }); } }, { passive: true });
+  window.addEventListener('resize', () => { fitMain(); updateMain(); });
+
   let unmount = null;
   function showTab(t) {
     $('#tab-name').textContent = t.name;
     const media = mediaOf(t), gal = $('#gallery');
     gal.innerHTML = '';
-    media.forEach((m) => gal.append(frame(m, media)));
+    media.forEach((m) => gal.append(entry(m, media)));
+    setMain(t);
     if (unmount) unmount();
     $('#tab-stage').classList.toggle('duo', !!t.actor);
     unmount = window.Objects.single($('#tab-stage'), t.object, t.actor);
@@ -151,14 +228,22 @@
     $('#view-home').hidden = !!t;
     $('#view-tab').hidden = !t;
     if (t) showTab(t);
-    else { if (unmount) { unmount(); unmount = null; } document.title = S.title; }
+    else { if (unmount) { unmount(); unmount = null; } document.title = S.title; setMain(null); }
     menu.querySelectorAll('a').forEach((a) => a.toggleAttribute('aria-current', a.dataset.id === (t ? t.id : 'home')));
     window.scrollTo(0, 0);
+    heroUpdate();
+    updateMain();
   }
 
   // photos/manifest.json (written on deploy) lists what's actually uploaded; it wins over config.js
   function applyManifest(man) {
-    for (const t of tabs) if (Array.isArray(man[t.id]) && man[t.id].length) t.media = man[t.id];
+    for (const t of tabs) {
+      const m = man[t.id];
+      if (Array.isArray(m)) { if (m.length) t.media = m; continue; }
+      if (!m) continue;
+      if (m.main) t.main = m.main;
+      if (m.media && (m.media.length || m.main)) t.media = m.media;
+    }
   }
 
   window.Objects.init();

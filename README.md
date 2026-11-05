@@ -3,7 +3,7 @@
 Static site, no build step. Open `index.html` through any static host (or `python3 -m http.server` locally).
 
 ## Adding photos and videos
-1. Put files in `photos/<tab id>/`, e.g. `photos/ibrahim/01.jpg`, `photos/drone/clip-01.mp4`.
+1. Put files in `photos/<tab id>/`, e.g. `photos/ibrahim/01.jpg`, `photos/drone/clip-01.mp4`. A file named `main` (main.jpg or main.mp4) opens that section full screen as you scroll; the rest follow in name order, each with space for text (set in `js/config.js` → `text`). Keep videos web-sized (H.264 mp4, about 1920px wide or less).
 2. Tabs with `media: 6` in `js/config.js` look for `01.jpg` … `06.jpg`. Change the number to show more.
    Or list file names instead: `media: ['sunset.jpg', 'jump.mp4']`. Videos: mp4 / webm / mov.
 3. Empty slots show the exact path they expect, so you can see what's missing.
