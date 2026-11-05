@@ -141,7 +141,8 @@
     gal.innerHTML = '';
     media.forEach((m) => gal.append(frame(m, media)));
     if (unmount) unmount();
-    unmount = window.Objects.single($('#tab-stage'), t.object);
+    $('#tab-stage').classList.toggle('duo', !!t.actor);
+    unmount = window.Objects.single($('#tab-stage'), t.object, t.actor);
     document.title = `${t.name} · ${S.title}`;
   }
 

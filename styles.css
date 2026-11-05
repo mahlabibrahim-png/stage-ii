@@ -82,6 +82,8 @@ body.over-video .menu-btn:hover { background: #ffffff; color: var(--ink); }
 .tab-name { margin: 0; text-align: center; font: 400 clamp(36px, 7vw, 72px)/1 var(--f-type); text-wrap: balance; overflow-wrap: anywhere; }
 .tab-stage { width: 100%; max-width: 560px; aspect-ratio: 1 / 1; justify-self: center; cursor: grab; touch-action: pan-y; }
 .tab-stage:active { cursor: grabbing; }
+.tab-stage.duo { max-width: 960px; aspect-ratio: 16 / 10; }
+@media (max-width: 640px) { .tab-stage.duo { aspect-ratio: 1 / 1; } }
 
 .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; margin-top: 16px; }
 .frame { position: relative; margin: 0; aspect-ratio: 4 / 5; max-width: 100%; overflow: hidden; background: var(--slot); }

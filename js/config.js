@@ -4,6 +4,7 @@
    Every entry below becomes an object on the home ring and its own tab.
    - group:  "collection" (shared shoots) or "member" (one person)
    - object: which 3D object to show (see js/objects.js BUILDERS)
+   - actor:  optional little animated guy shown next to it on the tab page (js/objects.js ACTORS)
    - media:  either a number N  -> loads photos/<id>/01.jpg ... N.jpg
              or a list of file names inside photos/<id>/ (jpg, png, webp, mp4, webm, mov)
    Missing files just show an empty slot, so you can fill them in over time.
@@ -31,27 +32,27 @@ window.STAGE = {
       media: 8,
     },
     {
-      id: 'mahmoud', group: 'member', name: 'Doodo', object: 'goggles', color: '#6fe9ff',
+      id: 'mahmoud', group: 'member', name: 'Doodo', object: 'goggles', actor: 'swim', color: '#6fe9ff',
       media: 6,
     },
     {
-      id: 'muhammad', group: 'member', name: 'Dodo', object: 'drawing', color: '#a9c8ff',
+      id: 'muhammad', group: 'member', name: 'Dodo', object: 'drawing', actor: 'draw', color: '#a9c8ff',
       media: 6,
     },
     {
-      id: 'tareq', group: 'member', name: 'Teeka', object: 'gloves', color: '#ff8f8f',
+      id: 'tareq', group: 'member', name: 'Teeka', object: 'gloves', actor: 'box', color: '#ff8f8f',
       media: 6,
     },
     {
-      id: 'belal', group: 'member', name: 'Nosseir', object: 'angel', color: '#ffb3e6',
+      id: 'belal', group: 'member', name: 'Nosseir', object: 'angel', actor: 'mac', color: '#ffb3e6',
       media: 6,
     },
     {
-      id: 'ibrahim', group: 'member', name: 'Hemi', object: 'hemi', color: '#ffbe6b',
+      id: 'ibrahim', group: 'member', name: 'Hemi', object: 'hemi', actor: 'bench', color: '#ffbe6b',
       media: 6,
     },
     {
-      id: 'bilal', group: 'member', name: 'Bilo', object: 'perfume', color: '#6fffc8',
+      id: 'bilal', group: 'member', name: 'Bilo', object: 'perfume', actor: 'spray', color: '#6fffc8',
       media: 6,
     },
   ],

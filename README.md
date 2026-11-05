@@ -17,6 +17,7 @@ The home page opens with `photos/drone/hero.mp4` (set in `js/config.js` as `hero
 ## Adding a new collection
 Copy an entry in `js/config.js`, give it a new `id`, `name` and an `object`.
 Available objects: drone, wakeboard, camera (movie camera), perfume, goggles, drawing, gloves, angel, hemi, tank. Add `center: true` to a tab to put its object in the middle of the wheel (Film does this).
+People pages can also show a little animated guy next to the object: set `actor` in `js/config.js` (spray, box, bench, draw, swim, mac; see ACTORS in `js/objects.js`).
 A new object is one builder function in `js/objects.js` (BUILDERS).
 
 ## Files

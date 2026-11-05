@@ -563,6 +563,290 @@
     },
   };
 
+  /* ---------- little people ----------
+     figure() builds a jointed guy in metres: feet on y=0, facing +z, about 1.8 tall.
+     Joints are groups to rotate: hips, spine, head, sh/el/hand (arms), hip/knee (legs); index 0 = his right (-x). */
+  function figure(k, o = {}) {
+    const { M, part } = k;
+    const G = () => new T.Group();
+    const skin = M(o.skin || '#c8956f', { r: 0.6 });
+    const top = o.shirtless ? skin : M(o.top || '#eeeeee', { r: 0.85 });
+    const fore = o.longSleeve ? top : skin;
+    const thighM = M(o.pants || '#2b2f38', { r: 0.85 });
+    const shinM = o.shorts ? skin : thighM;
+    const shoe = o.barefoot ? (o.feet ? M(o.feet, { r: 0.6 }) : skin) : M(o.shoes || '#1b1b1b', { r: 0.5, cc: 0.3 });
+    const hairM = M(o.hair || '#1a1410', { r: 0.75 });
+    const limb = (len, r, mat) => part(new T.CapsuleGeometry(r, Math.max(0.001, len - 2 * r), 6, 16), mat, [0, -len / 2 + r * 0.6, 0]);
+    const f = { sh: [], el: [], hand: [], hip: [], knee: [] };
+    f.root = G();
+    f.hips = G(); f.hips.position.y = 0.95; f.root.add(f.hips);
+    f.hips.add(part(new T.SphereGeometry(0.155, 24, 16), thighM, [0, 0, 0], null, [1, 0.72, 0.72]));
+    f.spine = G(); f.spine.position.y = 0.04; f.hips.add(f.spine);
+    f.spine.add(part(new T.CapsuleGeometry(0.14, 0.3, 8, 20), top, [0, 0.27, 0], null, [1.22, 1, 0.72]));
+    f.spine.add(part(new T.SphereGeometry(0.16, 24, 16), top, [0, 0.42, 0], null, [1.25, 0.55, 0.72])); // shoulders
+    f.spine.add(part(new T.CylinderGeometry(0.045, 0.05, 0.1, 16), skin, [0, 0.56, 0]));
+    f.head = G(); f.head.position.y = 0.6; f.spine.add(f.head);
+    f.head.add(part(new T.SphereGeometry(0.11, 32, 24), skin, [0, 0.1, 0], null, [0.9, 1.12, 1]));
+    f.head.add(part(new T.SphereGeometry(0.018, 10, 8), skin, [0, 0.085, 0.105])); // nose
+    for (const s of [-1, 1]) f.head.add(part(new T.SphereGeometry(0.022, 10, 8), skin, [s * 0.1, 0.09, 0], null, [0.5, 1, 0.8])); // ears
+    if (!o.noEyes) for (const s of [-1, 1]) {
+      f.head.add(part(new T.SphereGeometry(0.016, 12, 10), M('#f4f1ea', { r: 0.2 }), [s * 0.037, 0.115, 0.088]));
+      f.head.add(part(new T.SphereGeometry(0.0105, 12, 10), M(o.eyes || '#2a1a10', { r: 0.15, cc: 1 }), [s * 0.037, 0.115, 0.1]));
+      f.head.add(part(new T.BoxGeometry(0.035, 0.007, 0.01), hairM, [s * 0.038, 0.142, 0.098], [0, 0, -s * 0.12]));
+    }
+    if (o.curly) {
+      // curls: a cluster of small balls over the top and back of the head
+      for (let i = 0; i < 70; i++) {
+        const u = Math.random(), a = Math.random() * Math.PI * 2, el = Math.acos(1 - u * 1.15);
+        const r = 0.118 + Math.random() * 0.012;
+        const x = Math.sin(el) * Math.cos(a) * r * 0.95, y = Math.cos(el) * r * 1.12, z = Math.sin(el) * Math.sin(a) * r;
+        if (z > 0.06 && y < 0.07) continue; // keep the face clear
+        f.head.add(part(new T.SphereGeometry(0.026 + Math.random() * 0.012, 10, 8), hairM, [x, 0.12 + y, z - 0.005]));
+      }
+    } else if (o.cap) {
+      f.head.add(part(new T.SphereGeometry(0.117, 32, 16, 0, Math.PI * 2, 0, Math.PI * 0.55), M(o.cap, { r: 0.35, cc: 0.6 }), [0, 0.11, -0.003], [-0.25, 0, 0], [0.92, 1.12, 1]));
+    } else if (!o.bald) {
+      f.head.add(part(new T.SphereGeometry(0.116, 32, 16, 0, Math.PI * 2, 0, Math.PI * 0.45), hairM, [0, 0.115, -0.006], [-0.35, 0, 0], [0.93, 1.12, 1]));
+    }
+    [-1, 1].forEach((s, i) => {
+      const sh = G(); sh.position.set(s * 0.2, 0.44, 0); sh.rotation.z = s * 0.08; f.spine.add(sh);
+      sh.add(part(new T.SphereGeometry(0.06, 16, 12), top));
+      sh.add(limb(0.3, 0.052, top));
+      const el = G(); el.position.y = -0.29; sh.add(el);
+      el.add(part(new T.SphereGeometry(0.047, 14, 10), o.longSleeve ? top : skin));
+      el.add(limb(0.27, 0.043, fore));
+      const hand = G(); hand.position.y = -0.27; el.add(hand);
+      if (o.gloves) {
+        hand.add(part(new T.SphereGeometry(0.075, 24, 16), M(o.gloves, { r: 0.25, cc: 0.9 }), [0, -0.05, 0.01], null, [0.9, 1.1, 1]));
+        hand.add(part(new T.CylinderGeometry(0.055, 0.055, 0.06, 20), M(o.gloves, { r: 0.4, cc: 0.5 }), [0, 0.02, 0]));
+        if (o.gloveTrim) hand.add(part(new T.TorusGeometry(0.056, 0.007, 8, 24), M(o.gloveTrim, { m: 1, r: 0.3 }), [0, 0.0, 0], [Math.PI / 2, 0, 0]));
+      } else hand.add(part(new T.SphereGeometry(0.048, 16, 12), skin, [0, -0.04, 0], null, [0.75, 1.1, 0.55]));
+      const hip = G(); hip.position.set(s * 0.09, -0.03, 0); f.hips.add(hip);
+      hip.add(limb(0.46, 0.074, thighM));
+      const knee = G(); knee.position.y = -0.45; hip.add(knee);
+      knee.add(part(new T.SphereGeometry(0.064, 14, 10), shinM));
+      knee.add(limb(0.45, 0.055, shinM));
+      const foot = G(); foot.position.y = -0.44; knee.add(foot);
+      foot.add(part(new T.BoxGeometry(0.1, 0.07, 0.25), shoe, [0, -0.03, 0.055]));
+      f.sh[i] = sh; f.el[i] = el; f.hand[i] = hand; f.hip[i] = hip; f.knee[i] = knee;
+    });
+    return f;
+  }
+  const lerp = (a, b, k) => a + (b - a) * k;
+  const ease = (x) => 0.5 - 0.5 * Math.cos(Math.PI * Math.min(1, Math.max(0, x)));
+  const sit = (f, seat) => { f.hips.position.y = seat + 0.07; for (let i = 0; i < 2; i++) { f.hip[i].rotation.set(-Math.PI / 2, 0, (i ? 1 : -1) * 0.06); f.knee[i].rotation.x = Math.PI / 2; } };
+  const screenTex = (k) => k.tex(512, 340, (x, w, h) => {
+    x.fillStyle = '#16181d'; x.fillRect(0, 0, w, h); x.fillStyle = '#23262d'; x.fillRect(0, 0, 110, h); x.fillRect(0, 0, w, 22);
+    const cols = ['#7fb4ff', '#e6c07b', '#98c379', '#c678dd', '#e06c75', '#abb2bf'];
+    for (let i = 0; i < 17; i++) { let px = 126 + (i % 4) * 14; const y = 40 + i * 17; for (let j = 0; j < 1 + (i * 7) % 4; j++) { const ww = 20 + ((i * 13 + j * 29) % 70); x.fillStyle = cols[(i + j) % cols.length]; x.fillRect(px, y, ww, 7); px += ww + 8; } }
+    for (let i = 0; i < 10; i++) { x.fillStyle = '#3a3e47'; x.fillRect(14, 40 + i * 24, 60 + (i * 17) % 30, 7); }
+  });
+
+  const ACTORS = {
+    // Bilo: curly hair, hazel eyes, black tee, grey trousers, spraying perfume into the air.
+    spray(k) {
+      const { M, part } = k;
+      const g = new T.Group();
+      const f = figure(k, { top: '#141414', pants: '#7c7f85', shoes: '#efefef', hair: '#3a2416', curly: true, eyes: '#8b6b33' });
+      g.add(f.root);
+      const bottle = new T.Group();
+      bottle.add(part(new T.CylinderGeometry(0.028, 0.028, 0.07, 20), M('#0b0a0d', { r: 0.12, cc: 1 }), [0, 0.03, 0]));
+      bottle.add(part(new T.CylinderGeometry(0.028, 0.028, 0.05, 20), M('#d8448e', { r: 0.12, cc: 1 }), [0, -0.03, 0]));
+      bottle.add(part(new T.CylinderGeometry(0.012, 0.014, 0.035, 12), M('#d6b25e', { m: 1, r: 0.25 }), [0, 0.082, 0]));
+      const nozzle = new T.Object3D(); nozzle.position.set(0, 0.085, 0.015); bottle.add(nozzle);
+      bottle.position.set(0, -0.07, 0.03); f.hand[1].add(bottle);
+      const mist = [];
+      for (let i = 0; i < 26; i++) {
+        const m = new T.Mesh(new T.SphereGeometry(0.03, 10, 8), new T.MeshBasicMaterial({ color: 0xe9e4f2, transparent: true, opacity: 0, depthWrite: false }));
+        m.userData.seed = [Math.random() - 0.5, Math.random() - 0.5, Math.random()]; g.add(m); mist.push(m);
+      }
+      const P = new T.Vector3(), period = 2.4;
+      g.userData.tick = (t) => {
+        const ph = (t % period) / period, press = ph < 0.25 ? Math.sin((ph / 0.25) * Math.PI) : 0;
+        f.sh[1].rotation.set(-1.55, 0, -0.25); f.el[1].rotation.x = -0.35 - press * 0.12;
+        bottle.rotation.set(1.9 + press * 0.12, 0, 0);
+        f.sh[0].rotation.set(0.05, 0, -0.55); f.el[0].rotation.x = -1.7; // hand on hip
+        f.spine.rotation.set(0.03 * Math.sin(t * 1.4), 0.15, 0); f.head.rotation.set(-0.05, 0.12, 0.04 * Math.sin(t));
+        f.hip[0].rotation.z = -0.07; f.hip[1].rotation.z = 0.05;
+        g.updateMatrixWorld(true); nozzle.getWorldPosition(P); g.worldToLocal(P);
+        mist.forEach((m, i) => {
+          const s = m.userData.seed, age = ((t * 1.5 + i / mist.length) % 1), born = t - age / 1.5;
+          const on = ((born % period) / period) < 0.25;
+          m.visible = on;
+          if (!on) return;
+          m.position.set(P.x + s[0] * age * 0.35 + age * 0.05, P.y + s[1] * age * 0.3 + age * 0.05, P.z + age * (0.5 + s[2] * 0.4));
+          m.scale.setScalar(0.4 + age * 2.4);
+          m.material.opacity = 0.55 * (1 - age);
+        });
+      };
+      return g;
+    },
+
+    // Teeka: shirtless, black boxing shorts with gold waistband, gloves up, shadow boxing.
+    box(k) {
+      const { M, part } = k;
+      const g = new T.Group();
+      const f = figure(k, { shirtless: true, shorts: true, pants: '#111111', shoes: '#141414', gloves: '#141414', gloveTrim: '#c9a24a', hair: '#15100c' });
+      f.hips.add(part(new T.CylinderGeometry(0.16, 0.16, 0.06, 32), M('#c9a24a', { m: 0.6, r: 0.35 }), [0, 0.07, 0], null, [1, 1, 0.76]));
+      g.add(f.root);
+      g.userData.tick = (t) => {
+        const bob = Math.sin(t * 7) * 0.015;
+        f.hips.position.y = 0.9 + bob;
+        f.hip[0].rotation.set(0.28, 0, -0.12); f.knee[0].rotation.x = 0.35; // rear leg
+        f.hip[1].rotation.set(-0.38, 0, 0.12); f.knee[1].rotation.x = 0.32; // lead leg
+        const cyc = (t % 1.4) / 1.4, side = cyc < 0.5 ? 1 : 0, p = Math.sin(Math.min(1, (cyc % 0.5) / 0.28) * Math.PI);
+        for (let i = 0; i < 2; i++) {
+          const s = i ? 1 : -1, k2 = i === side ? p : 0;
+          f.sh[i].rotation.set(lerp(-0.55, -1.55, k2), 0, s * lerp(-0.32, -0.08, k2));
+          f.el[i].rotation.x = lerp(-2.25, -0.12, k2);
+        }
+        f.spine.rotation.set(0.08, (side ? -1 : 1) * 0.32 * p, 0);
+        f.head.rotation.set(0.12, (side ? 1 : -1) * 0.15 * p, 0);
+      };
+      return g;
+    },
+
+    // Hemi: grey hoodie, lying on a bench, pressing a barbell.
+    bench(k) {
+      const { M, part } = k;
+      const g = new T.Group(), inner = new T.Group(); g.add(inner);
+      const f = figure(k, { top: '#6d7076', longSleeve: true, pants: '#1f2026', shoes: '#f1f1f1', hair: '#120d0a' });
+      f.spine.add(part(new T.TorusGeometry(0.11, 0.045, 12, 24, Math.PI * 1.2), M('#6d7076', { r: 0.85 }), [0, 0.53, -0.06], [Math.PI / 2 - 0.3, 0, -Math.PI * 0.1])); // hood
+      f.spine.add(part(new T.BoxGeometry(0.2, 0.1, 0.02), M('#62656b', { r: 0.9 }), [0, 0.12, 0.1])); // pocket
+      const top = 0.4;
+      f.root.rotation.x = -Math.PI / 2; f.root.position.y = top + 0.12;
+      inner.add(f.root);
+      const pad = M('#141416', { r: 0.6, cc: 0.3 }), steel = M('#9da1a6', { m: 1, r: 0.3 });
+      inner.add(part(new T.BoxGeometry(0.3, 0.09, 1.15), pad, [0, top - 0.045, -1.32]));
+      for (const z of [-0.85, -1.8]) { inner.add(part(new T.BoxGeometry(0.06, top - 0.09, 0.06), steel, [0, (top - 0.09) / 2, z])); inner.add(part(new T.BoxGeometry(0.4, 0.04, 0.06), steel, [0, 0.02, z])); }
+      for (const s of [-1, 1]) inner.add(part(new T.BoxGeometry(0.05, 1.05, 0.05), steel, [s * 0.55, 0.525, -1.62])); // rack posts
+      const bar = new T.Group(); inner.add(bar);
+      bar.add(part(new T.CylinderGeometry(0.014, 0.014, 1.6, 16), M('#d0d3d6', { m: 1, r: 0.2 }), [0, 0, 0], [0, 0, Math.PI / 2]));
+      for (const s of [-1, 1]) {
+        bar.add(part(new T.CylinderGeometry(0.2, 0.2, 0.05, 40), M('#151515', { r: 0.5 }), [s * 0.62, 0, 0], [0, 0, Math.PI / 2]));
+        bar.add(part(new T.CylinderGeometry(0.16, 0.16, 0.04, 40), M('#151515', { r: 0.5 }), [s * 0.68, 0, 0], [0, 0, Math.PI / 2]));
+        bar.add(part(new T.CylinderGeometry(0.03, 0.03, 0.03, 16), steel, [s * 0.72, 0, 0], [0, 0, Math.PI / 2]));
+      }
+      for (let i = 0; i < 2; i++) { f.hip[i].rotation.set(0, 0, (i ? 1 : -1) * 0.22); f.knee[i].rotation.x = Math.PI / 2; }
+      const a = new T.Vector3(), b = new T.Vector3();
+      g.userData.tick = (t) => {
+        const p = ease((Math.sin(t * 1.8) + 1) / 2); // 0 = bar on chest, 1 = arms locked out
+        for (let i = 0; i < 2; i++) {
+          const s = i ? 1 : -1;
+          f.sh[i].rotation.set(lerp(-0.55, -1.57, p), 0, s * lerp(1.05, 0.22, p));
+          f.el[i].rotation.set(lerp(-1.75, -0.05, p), 0, -s * lerp(0.9, 0, p));
+        }
+        f.head.rotation.x = 0.1;
+        g.updateMatrixWorld(true);
+        f.hand[0].getWorldPosition(a); f.hand[1].getWorldPosition(b); inner.worldToLocal(a); inner.worldToLocal(b);
+        bar.position.set(0, (a.y + b.y) / 2 - 0.02, (a.z + b.z) / 2);
+      };
+      inner.position.z = 0.9; g.rotation.y = Math.PI / 2;
+      return g;
+    },
+
+    // Dodo: on a stool at a drafting table, sketching.
+    draw(k) {
+      const { M, part, tex } = k;
+      const g = new T.Group();
+      const f = figure(k, { top: '#e8e2d4', pants: '#39414f', shoes: '#2a2723', hair: '#1b130e' });
+      sit(f, 0.55);
+      g.add(f.root);
+      const wood = M('#b98a5a', { r: 0.55 }), steel = M('#2a2b2e', { m: 0.6, r: 0.4 });
+      g.add(part(new T.CylinderGeometry(0.18, 0.18, 0.05, 32), M('#1c1c1e', { r: 0.6 }), [0, 0.53, -0.02]));
+      for (let i = 0; i < 3; i++) { const a = i * 2.09; g.add(part(new T.CylinderGeometry(0.015, 0.015, 0.55, 8), steel, [Math.sin(a) * 0.13, 0.27, Math.cos(a) * 0.13 - 0.02], [Math.cos(a) * 0.18, 0, -Math.sin(a) * 0.18])); }
+      const sheet = tex(512, 384, (x, w, h) => {
+        x.fillStyle = '#faf9f5'; x.fillRect(0, 0, w, h); x.strokeStyle = '#1f1f1f'; x.lineWidth = 2;
+        x.strokeRect(120, 150, 170, 140); x.strokeRect(220, 90, 180, 110); x.beginPath(); x.moveTo(60, 320); x.lineTo(460, 300); x.moveTo(120, 150); x.lineTo(200, 110); x.moveTo(290, 150); x.lineTo(400, 90); x.stroke();
+        x.lineWidth = 1; for (let i = 0; i < 8; i++) { x.beginPath(); x.moveTo(230 + i * 20, 100); x.lineTo(230 + i * 20, 190); x.stroke(); }
+      });
+      const board = new T.Group(); board.position.set(0, 0.86, 0.5); board.rotation.x = -0.45; g.add(board);
+      board.add(part(new T.BoxGeometry(0.9, 0.03, 0.62), wood));
+      const paper = new T.Mesh(new T.PlaneGeometry(0.6, 0.45), MT2(k, { map: sheet, roughness: 0.9 })); paper.rotation.x = -Math.PI / 2; paper.position.y = 0.017; paper.receiveShadow = true; board.add(paper);
+      board.add(part(new T.BoxGeometry(0.8, 0.02, 0.03), M('#c9ccd0', { m: 1, r: 0.3 }), [0, 0.025, -0.18])); // parallel rule
+      for (const s of [-1, 1]) g.add(part(new T.BoxGeometry(0.04, 0.8, 0.04), steel, [s * 0.4, 0.4, 0.55]));
+      const pencil = part(new T.CylinderGeometry(0.006, 0.006, 0.15, 8), M('#e7b416', { r: 0.4 }), [0, -0.07, 0.02], [0.3, 0, 0]);
+      f.hand[1].add(pencil);
+      g.userData.tick = (t) => {
+        f.spine.rotation.set(0.3, 0, 0); f.head.rotation.set(0.45, -0.1, 0);
+        f.sh[1].rotation.set(-0.95 + 0.07 * Math.sin(t * 4.5), 0, 0.12 + 0.07 * Math.cos(t * 4.5)); f.el[1].rotation.x = -0.75 + 0.05 * Math.sin(t * 9);
+        f.sh[0].rotation.set(-0.85, 0, 0.05); f.el[0].rotation.x = -0.85;
+      };
+      return g;
+    },
+
+    // Doodo: full swimsuit, red cap and mirrored goggles, front crawl in a block of water.
+    swim(k) {
+      const { M, MT, part } = k;
+      const g = new T.Group(), inner = new T.Group(); g.add(inner);
+      const suit = '#13234a';
+      const f = figure(k, { top: suit, longSleeve: true, pants: suit, barefoot: true, cap: '#c41a1f' });
+      for (const s of [-1, 1]) f.head.add(part(new T.SphereGeometry(0.03, 16, 12), M('#d42a1f', { m: 0.9, r: 0.08, cc: 1 }), [s * 0.038, 0.115, 0.093], null, [1.2, 0.8, 0.6]));
+      f.head.add(part(new T.TorusGeometry(0.108, 0.008, 8, 40), M('#111', { r: 0.4 }), [0, 0.115, 0], [Math.PI / 2, 0, 0], [0.92, 1, 1]));
+      f.root.rotation.x = Math.PI / 2; f.root.position.set(0, 0.36, -0.95);
+      inner.add(f.root);
+      const W = 2.6, D = 1.3, Hw = 0.42;
+      inner.add(part(new T.BoxGeometry(D, Hw, W), MT({ color: '#4aa8cf', transparent: true, opacity: 0.32, roughness: 0.05, clearcoat: 1, depthWrite: false }), [0, Hw / 2, 0]));
+      const sg = new T.PlaneGeometry(D, W, 30, 60); sg.rotateX(-Math.PI / 2);
+      const surf = new T.Mesh(sg, MT({ color: '#6fc3e0', transparent: true, opacity: 0.55, roughness: 0.03, clearcoat: 1, side: T.DoubleSide, depthWrite: false }));
+      surf.position.y = Hw; inner.add(surf);
+      const sp = sg.attributes.position;
+      g.userData.tick = (t) => {
+        const a = t * 3.2;
+        for (let i = 0; i < 2; i++) {
+          const ph = a + i * Math.PI;
+          f.sh[i].rotation.set(-ph, 0, (i ? 1 : -1) * 0.12);
+          f.el[i].rotation.x = Math.sin(ph) > 0 ? -0.5 * Math.sin(ph) : -0.15;
+          f.hip[i].rotation.set(0.28 * Math.sin(t * 9 + i * Math.PI), 0, (i ? 1 : -1) * 0.04);
+          f.knee[i].rotation.x = 0.15 + 0.12 * Math.sin(t * 9 + i * Math.PI + 0.6);
+        }
+        f.spine.rotation.y = 0.35 * Math.sin(a);
+        f.head.rotation.set(-0.25, 0.9 * Math.pow(Math.max(0, Math.sin(a * 0.5)), 6), 0);
+        f.root.position.y = 0.36 + 0.015 * Math.sin(a * 2);
+        for (let i = 0; i < sp.count; i++) { const x = sp.getX(i), z = sp.getZ(i); sp.setY(i, 0.012 * Math.sin(x * 9 + t * 2.2) + 0.01 * Math.sin(z * 7 - t * 3.1)); }
+        sp.needsUpdate = true; sg.computeVertexNormals();
+      };
+      g.rotation.y = -Math.PI / 2;
+      return g;
+    },
+
+    // Nosseir: at a desk on an office chair, typing on a silver laptop.
+    mac(k) {
+      const { M, part } = k;
+      const g = new T.Group();
+      const f = figure(k, { top: '#2f4b40', pants: '#c6b796', shoes: '#3b2a20', hair: '#14100c' });
+      sit(f, 0.5);
+      g.add(f.root);
+      const black = M('#1a1a1c', { r: 0.5 }), alu = M('#c9cbce', { m: 1, r: 0.28 }), deskM = M('#ece9e3', { r: 0.45, cc: 0.2 });
+      g.add(part(new T.BoxGeometry(0.48, 0.06, 0.46), black, [0, 0.47, -0.02]));
+      g.add(part(new T.BoxGeometry(0.46, 0.5, 0.05), black, [0, 0.8, -0.26], [-0.08, 0, 0]));
+      g.add(part(new T.CylinderGeometry(0.025, 0.025, 0.38, 12), alu, [0, 0.25, -0.02]));
+      for (let i = 0; i < 5; i++) { const a = (i / 5) * Math.PI * 2; g.add(part(new T.BoxGeometry(0.04, 0.03, 0.28), black, [Math.sin(a) * 0.13, 0.05, Math.cos(a) * 0.13 - 0.02], [0, a, 0])); }
+      g.add(part(new T.BoxGeometry(1.2, 0.04, 0.62), deskM, [0, 0.74, 0.62]));
+      for (const sx of [-0.56, 0.56]) for (const sz of [0.36, 0.88]) g.add(part(new T.BoxGeometry(0.04, 0.72, 0.04), alu, [sx, 0.36, sz]));
+      const lap = new T.Group(); lap.position.set(0, 0.765, 0.58); g.add(lap);
+      lap.add(part(new T.BoxGeometry(0.34, 0.016, 0.23), alu));
+      lap.add(part(new T.BoxGeometry(0.29, 0.002, 0.1), M('#222326', { r: 0.6 }), [0, 0.009, -0.02]));
+      const lid = new T.Group(); lid.position.set(0, 0.008, 0.115); lid.rotation.x = -0.28; lap.add(lid);
+      lid.add(part(new T.BoxGeometry(0.34, 0.225, 0.008), alu, [0, 0.112, 0]));
+      const scr = new T.Mesh(new T.PlaneGeometry(0.31, 0.2), new T.MeshBasicMaterial({ map: screenTex(k), toneMapped: false }));
+      scr.position.set(0, 0.115, -0.0045); scr.rotation.y = Math.PI; lid.add(scr);
+      g.add(part(new T.CylinderGeometry(0.04, 0.035, 0.1, 20), M('#e9e5dc', { r: 0.4, cc: 0.6 }), [0.4, 0.81, 0.62])); // mug
+      g.userData.tick = (t) => {
+        f.spine.rotation.set(0.12, 0, 0); f.head.rotation.set(0.22 + 0.03 * Math.sin(t * 0.7), 0.05 * Math.sin(t * 0.4), 0);
+        for (let i = 0; i < 2; i++) {
+          const s = i ? 1 : -1;
+          f.sh[i].rotation.set(-0.55, 0, -s * 0.1);
+          f.el[i].rotation.set(-1.0 + 0.05 * Math.max(0, Math.sin(t * 16 + i * 2.1)), 0, s * 0.15);
+        }
+      };
+      return g;
+    },
+  };
+  // material with maps, outside kit() destructuring for the drafting paper
+  const MT2 = (k, o) => k.MT(o);
+
+
   /* ---------- shared renderer ---------- */
   let renderer = null, canvas = null, envTex = null;
   const views = new Set();
@@ -728,14 +1012,29 @@
   }
 
   /* Tab page: one object turning on its own; drag to turn it. */
-  function single(el, key) {
+  // With `actorKey`, a little animated guy (ACTORS) stands next to the object.
+  function single(el, key, actorKey) {
     if (!renderer) return null;
     const scene = baseScene('floor');
-    const it = item(key, 2.3);
+    const duo = !!(actorKey && ACTORS[actorKey]);
+    const it = item(key, duo ? 2.0 : 2.3);
     scene.add(it.tilt);
+    let actor = null;
+    if (duo) {
+      actor = ACTORS[actorKey](kit());
+      if (actor.userData.tick) actor.userData.tick(0);
+      actor.updateMatrixWorld(true);
+      const box = new T.Box3().setFromObject(actor), c = new T.Vector3(); box.getCenter(c);
+      const wrap = new T.Group(); actor.position.x -= c.x; actor.position.z -= c.z;
+      wrap.add(actor); wrap.scale.setScalar(1.3); wrap.position.set(1.4, -1.2, 0); wrap.rotation.y = -0.35;
+      wrap.traverse((n) => { if (n.isMesh && !n.material.transparent) { n.castShadow = true; n.receiveShadow = true; } });
+      scene.add(wrap);
+      it.tilt.position.x = -1.4;
+    }
     const camera = new T.PerspectiveCamera(30, 1, 0.1, 50);
-    camera.position.set(0, 1.8, 6.4); camera.lookAt(0, -0.1, 0);
-    const v = { el, scene, camera, kind: 'single', it, drag: null, angle: 0 };
+    if (duo) { camera.position.set(0, 1.4, 8.4); camera.lookAt(0, -0.3, 0); }
+    else { camera.position.set(0, 1.8, 6.4); camera.lookAt(0, -0.1, 0); }
+    const v = { el, scene, camera, kind: 'single', it, actor, drag: null, angle: 0 };
     el.addEventListener('pointerdown', (e) => { v.drag = { x: e.clientX, a: v.angle }; el.setPointerCapture(e.pointerId); });
     el.addEventListener('pointermove', (e) => { if (v.drag) v.angle = v.drag.a + (e.clientX - v.drag.x) * 0.01; });
     el.addEventListener('pointerup', () => (v.drag = null));
@@ -785,6 +1084,7 @@
         if (!v.drag) v.angle += dt * 0.5 * slow;
         v.it.spin.rotation.y = v.angle;
         if (v.it.obj.userData.tick) v.it.obj.userData.tick(t);
+        if (v.actor && v.actor.userData.tick) v.actor.userData.tick(t * slow);
       }
       v.camera.updateProjectionMatrix();
       const bottom = hgt - r.bottom;
