@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Stage II</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Courier+Prime&display=swap">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="top">
+  <a class="mark" href="#home">Stage II</a>
+  <div class="menu-wrap">
+    <button class="menu-btn" id="menu-btn" aria-label="Pages" aria-haspopup="true" aria-expanded="false" aria-controls="menu"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="1.6" fill="none"/></svg></button>
+    <ul class="menu" id="menu" hidden></ul>
+  </div>
+</header>
+
+<main>
+  <section id="view-home" class="view home">
+    <div class="hero" id="hero">
+      <video id="hero-video" muted loop playsinline autoplay preload="auto"></video>
+    </div>
+    <div class="hero-space" id="hero-space" aria-hidden="true"></div>
+    <div class="ring" id="ring" aria-label="Spin the wheel and pick an object"></div>
+    <p class="hover-name" id="hover-name" aria-live="polite">&nbsp;</p>
+  </section>
+
+  <section id="view-tab" class="view" hidden>
+    <h1 class="tab-name" id="tab-name"></h1>
+    <div class="tab-stage" id="tab-stage"></div>
+    <div class="gallery" id="gallery"></div>
+  </section>
+</main>
+
+<div class="lightbox" id="lightbox" hidden role="dialog" aria-modal="true" aria-label="Viewer">
+  <div class="lb-media" id="lb-media"></div>
+  <button class="lb-btn lb-prev" id="lb-prev" aria-label="Previous">←</button>
+  <button class="lb-btn lb-next" id="lb-next" aria-label="Next">→</button>
+  <button class="lb-btn lb-close" id="lb-close" aria-label="Close">×</button>
+</div>
+
+<script src="js/vendor/three.min.js"></script>
+<script src="js/config.js"></script>
+<script src="js/objects.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
