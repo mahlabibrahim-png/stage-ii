@@ -436,6 +436,89 @@
       g.userData.tilt = 0.4;
       return g;
     },
+
+    // 35mm film SLR: chrome top and base plates, black leatherette, prism hump, knurled lens with aperture scale.
+    camera({ M, MT, part, rbox, tex, noise }) {
+      const g = new T.Group();
+      const chrome = M('#d9dadc', { m: 1, r: 0.18 }), satin = M('#b9bbbe', { m: 1, r: 0.35 });
+      const black = M('#121212', { r: 0.35, cc: 0.4 }), rubber = M('#0c0c0c', { r: 0.75 });
+      const leather = MT({ color: '#151515', roughness: 0.85, bumpMap: noise(256, 256, 60, 200), bumpScale: 0.006 });
+      const ALONG_Z = [Math.PI / 2, 0, 0];
+      // body: leatherette core, chrome top and base plates
+      g.add(part(new T.BoxGeometry(1.44, 0.46, 0.4), leather, [0, -0.02, 0]));
+      g.add(part(rbox(1.46, 0.12, 0.42, 0.04), chrome, [0, 0.26, 0]));
+      g.add(part(rbox(1.46, 0.07, 0.42, 0.03), chrome, [0, -0.28, 0]));
+      // pentaprism hump
+      const hump = new T.Shape();
+      hump.moveTo(-0.3, 0); hump.lineTo(0.3, 0); hump.lineTo(0.17, 0.27); hump.lineTo(-0.17, 0.27); hump.lineTo(-0.3, 0);
+      const hg = new T.ExtrudeGeometry(hump, { depth: 0.3, bevelEnabled: true, bevelSize: 0.02, bevelThickness: 0.02, bevelSegments: 3 });
+      hg.translate(0, 0, -0.15);
+      g.add(part(hg, chrome, [0, 0.31, -0.02]));
+      g.add(part(new T.BoxGeometry(0.26, 0.09, 0.012), black, [0, 0.43, 0.15], [-0.42, 0, 0])); // blank nameplate
+      g.add(part(new T.BoxGeometry(0.2, 0.06, 0.012), black, [0, 0.47, -0.19])); // prism back
+      // eyepiece
+      g.add(part(rbox(0.2, 0.15, 0.08, 0.03), rubber, [0, 0.4, -0.22]));
+      g.add(part(new T.BoxGeometry(0.12, 0.08, 0.01), M('#1a2230', { r: 0.05, cc: 1 }), [0, 0.4, -0.262]));
+      // lens: mount, barrel, focus ring (knurled), aperture ring (scale), front ring and glass
+      const lz = 0.2;
+      g.add(part(new T.CylinderGeometry(0.29, 0.29, 0.06, 64), chrome, [0, -0.02, lz + 0.03], ALONG_Z));
+      g.add(part(new T.CylinderGeometry(0.255, 0.27, 0.08, 64), black, [0, -0.02, lz + 0.1], ALONG_Z));
+      const scale = tex(1024, 64, (x, w, h) => {
+        x.fillStyle = '#e9e9e9'; x.fillRect(0, 0, w, h);
+        x.fillStyle = '#111'; x.font = '600 30px Arial'; x.textAlign = 'center';
+        const f = ['2', '2.8', '4', '5.6', '8', '11', '16', '22'];
+        f.forEach((s, i) => x.fillText(s, (i + 0.5) * (w / 2) / f.length, 44));
+        f.forEach((s, i) => x.fillText(s, w / 2 + (i + 0.5) * (w / 2) / f.length, 44));
+      });
+      g.add(part(new T.CylinderGeometry(0.26, 0.26, 0.06, 64, 1, true), MT({ map: scale, metalness: 0.6, roughness: 0.3 }), [0, -0.02, lz + 0.17], ALONG_Z));
+      const knurl = tex(512, 16, (x, w, h) => { for (let i = 0; i < w; i += 8) { x.fillStyle = '#fff'; x.fillRect(i, 0, 4, h); x.fillStyle = '#000'; x.fillRect(i + 4, 0, 4, h); } }, false);
+      g.add(part(new T.CylinderGeometry(0.27, 0.27, 0.13, 96), MT({ color: '#141414', roughness: 0.55, bumpMap: knurl, bumpScale: 0.02 }), [0, -0.02, lz + 0.265], ALONG_Z));
+      const dist = tex(1024, 48, (x, w, h) => {
+        x.fillStyle = '#d9dadc'; x.fillRect(0, 0, w, h); x.fillStyle = '#222'; x.font = '24px Arial'; x.textAlign = 'center';
+        ['∞', '10', '5', '3', '2', '1.5', '1', '.7', '.5', '.45'].forEach((s, i) => x.fillText(s, (i + 0.5) * w / 10, 32));
+      });
+      g.add(part(new T.CylinderGeometry(0.25, 0.25, 0.05, 64, 1, true), MT({ map: dist, metalness: 0.7, roughness: 0.25 }), [0, -0.02, lz + 0.355], ALONG_Z));
+      g.add(part(new T.CylinderGeometry(0.24, 0.25, 0.05, 64, 1, true), M('#121212', { r: 0.35, cc: 0.4, ds: 1 }), [0, -0.02, lz + 0.405], ALONG_Z));
+      g.add(part(new T.TorusGeometry(0.205, 0.018, 12, 64), satin, [0, -0.02, lz + 0.43]));
+      const glass = MT({ color: '#5a4a86', metalness: 0.85, roughness: 0.06, clearcoat: 1, clearcoatRoughness: 0.02, envMapIntensity: 1.8 });
+      const lens = new T.Mesh(new T.SphereGeometry(0.3, 48, 24, 0, Math.PI * 2, 0, 0.72), glass);
+      lens.rotation.x = Math.PI / 2; lens.position.set(0, -0.02, lz + 0.235); lens.scale.set(1, 0.6, 1);
+      g.add(lens);
+      g.add(part(new T.CylinderGeometry(0.07, 0.07, 0.01, 32), M('#3a2a5a', { m: 0.5, r: 0.05, cc: 1 }), [0, -0.02, lz + 0.39], ALONG_Z));
+      // top controls: shutter dial, release button, advance lever, rewind knob and crank
+      const dialTop = tex(128, 128, (x, w, h) => {
+        x.fillStyle = '#cfd0d2'; x.fillRect(0, 0, w, h); x.fillStyle = '#111'; x.font = '600 11px Arial'; x.textAlign = 'center';
+        ['B', '1', '2', '4', '8', '15', '30', '60', '125', '250', '500', '1000'].forEach((s, i) => {
+          const a = (i / 12) * Math.PI * 2; x.fillText(s, 64 + Math.sin(a) * 46, 68 - Math.cos(a) * 46);
+        });
+      });
+      const dialMats = [MT({ color: '#c9cacc', metalness: 1, roughness: 0.3, bumpMap: knurl, bumpScale: 0.01 }), MT({ map: dialTop, metalness: 0.5, roughness: 0.35 }), chrome];
+      g.add(part(new T.CylinderGeometry(0.13, 0.13, 0.07, 48), dialMats, [0.42, 0.355, 0.02]));
+      g.add(part(new T.CylinderGeometry(0.035, 0.04, 0.05, 24), chrome, [0.42, 0.41, 0.02]));
+      g.add(part(new T.CylinderGeometry(0.05, 0.05, 0.035, 24), chrome, [0.6, 0.34, 0.1]));
+      g.add(part(new T.CylinderGeometry(0.025, 0.025, 0.02, 16), black, [0.6, 0.365, 0.1]));
+      g.add(part(new T.CylinderGeometry(0.06, 0.06, 0.03, 24), chrome, [0.56, 0.335, -0.12]));
+      g.add(part(new T.BoxGeometry(0.34, 0.016, 0.06), chrome, [0.46, 0.355, -0.24], [0, 0.55, 0]));
+      g.add(part(new T.BoxGeometry(0.1, 0.03, 0.065), black, [0.33, 0.355, -0.34], [0, 0.55, 0]));
+      g.add(part(new T.CylinderGeometry(0.11, 0.11, 0.08, 48), dialMats[0], [-0.48, 0.36, 0.02]));
+      g.add(part(new T.CylinderGeometry(0.11, 0.11, 0.012, 48), chrome, [-0.48, 0.405, 0.02]));
+      g.add(part(new T.BoxGeometry(0.16, 0.012, 0.035), satin, [-0.42, 0.418, 0.02], [0, 0.4, 0]));
+      g.add(part(new T.CylinderGeometry(0.012, 0.012, 0.05, 10), black, [-0.36, 0.44, 0.07]));
+      // hot shoe on the prism
+      g.add(part(new T.BoxGeometry(0.16, 0.02, 0.16), satin, [0, 0.6, -0.02]));
+      // front details: self-timer lever, depth-of-field button, strap lugs
+      g.add(part(new T.BoxGeometry(0.04, 0.13, 0.02), chrome, [-0.42, 0.06, 0.215], [0, 0, 0.3]));
+      g.add(part(new T.CylinderGeometry(0.03, 0.03, 0.025, 20), chrome, [0.38, 0.1, 0.212], ALONG_Z));
+      for (const s of [-1, 1]) {
+        g.add(part(new T.CylinderGeometry(0.03, 0.03, 0.04, 16), chrome, [s * 0.74, 0.16, 0], [0, 0, Math.PI / 2]));
+        g.add(part(new T.TorusGeometry(0.04, 0.01, 8, 20), chrome, [s * 0.78, 0.16, 0], [0, Math.PI / 2, 0]));
+      }
+      // film rewind / back door seam and tripod socket
+      g.add(part(new T.BoxGeometry(1.44, 0.006, 0.006), M('#050505'), [0, -0.235, -0.2]));
+      g.add(part(new T.CylinderGeometry(0.035, 0.035, 0.01, 20), satin, [0, -0.318, 0]));
+      g.userData.tilt = 0.18;
+      return g;
+    },
   };
 
   /* ---------- shared renderer ---------- */
@@ -535,17 +618,21 @@
     if (!renderer) return null;
     const scene = baseScene('wall');
     const rim = new T.Group(); scene.add(rim);
-    const n = tabs.length;
+    // tabs marked `center: true` sit in the middle of the wheel (they spin but don't ride the rim)
+    const onRim = tabs.filter((t) => !t.center), n = onRim.length;
     const items = tabs.map((t, i) => {
-      const it = item(t.object, 1.8);
+      const it = item(t.object, t.center ? 2.5 : 1.8);
       const holder = new T.Group();
-      const a = (i / n) * Math.PI * 2;
-      holder.position.set(Math.sin(a) * R, Math.cos(a) * R, 0);
+      if (t.center) scene.add(holder);
+      else {
+        const a = (onRim.indexOf(t) / n) * Math.PI * 2;
+        holder.position.set(Math.sin(a) * R, Math.cos(a) * R, 0);
+        rim.add(holder);
+      }
       holder.add(it.tilt);
       holder.userData.tab = t;
-      rim.add(holder);
       it.spin.rotation.y = i * 0.9;
-      return { ...it, holder, tab: t, hover: 0 };
+      return { ...it, holder, tab: t, center: !!t.center, hover: 0 };
     });
     const camera = new T.PerspectiveCamera(30, 1, 0.1, 80);
     const v = { el, scene, camera, kind: 'wheel', items, rim, angle: 0, vel: 0.1, hovered: null, drag: null };
@@ -615,7 +702,7 @@
     return () => { views.delete(v); dispose(scene); };
   }
 
-  function dispose(o) { o.traverse((n) => { if (n.geometry) n.geometry.dispose(); if (n.material) n.material.dispose(); }); }
+  function dispose(o) { o.traverse((n) => { if (n.geometry) n.geometry.dispose(); if (n.material) [].concat(n.material).forEach((m) => m.dispose()); }); }
 
   let last = performance.now();
   function loop(now) {
@@ -640,7 +727,7 @@
         }
         v.rim.rotation.z = -v.angle;
         for (const it of v.items) {
-          it.holder.rotation.z = v.angle; // keep every object upright as the wheel turns
+          if (!it.center) it.holder.rotation.z = v.angle; // keep every object upright as the wheel turns
           it.spin.rotation.y += dt * 0.6 * slow;
           it.hover += ((v.hovered === it ? 1 : 0) - it.hover) * Math.min(1, dt * 8);
           it.holder.scale.setScalar(1 + it.hover * 0.15);

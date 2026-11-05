@@ -26,6 +26,11 @@ window.STAGE = {
       media: 8,
     },
     {
+      // center: true puts this object in the middle of the home wheel
+      id: 'film', group: 'collection', name: 'Film', object: 'camera', color: '#d9dadc', center: true,
+      media: 8,
+    },
+    {
       id: 'mahmoud', group: 'member', name: 'Doodo', object: 'goggles', color: '#6fe9ff',
       media: 6,
     },
