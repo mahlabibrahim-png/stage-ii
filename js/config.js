@@ -31,6 +31,9 @@ window.STAGE = {
       // center: true puts this object in the middle of the home wheel
       id: 'film', group: 'collection', name: 'Film', object: 'camera', color: '#d9dadc', center: true,
       media: [],
+      text: {
+        '01.mp4': 'Dear visitor,\n\nWelcome to Stage II. Here you will meet the six members of a rare pride of young lions. Follow us through our adventures, and take your fill of the laughter and mischief we gather along the way.\n\nConsider this our gift: a small offering of joy, and a taste of freedom for anyone who cares to share it.\n\n— Stage II',
+      },
     },
     {
       id: 'mahmoud', group: 'member', name: 'Doodo', object: 'goggles', actor: 'swim', color: '#6fe9ff',
