@@ -513,33 +513,52 @@
       return g;
     },
 
-    // Montale-style metal flask perfume (Starry Nights): deep navy metallic bottle with tiny stars, silver collar, tall cap.
+    // Starry Nights flask: glossy black fading to magenta-pink at the base, gold ornament, black/gold name label, gold spray pump.
     perfume({ M, MT, part, tex }) {
       const g = new T.Group();
-      const stars = tex(1024, 512, (x, w, h) => {
-        const grad = x.createLinearGradient(0, 0, 0, h);
-        grad.addColorStop(0, '#2b2f73'); grad.addColorStop(0.55, '#16184a'); grad.addColorStop(1, '#0a0b26');
-        x.fillStyle = grad; x.fillRect(0, 0, w, h);
-        for (let i = 0; i < 420; i++) {
-          const px = Math.random() * w, py = Math.random() * h, r = Math.random() < 0.08 ? 2.4 : 0.6 + Math.random();
-          x.fillStyle = `rgba(235,235,255,${0.5 + Math.random() * 0.5})`; x.beginPath(); x.arc(px, py, r, 0, 7); x.fill();
-        }
-        // a few four-point sparkles
-        x.strokeStyle = 'rgba(255,255,255,0.9)'; x.lineWidth = 1.5;
-        for (let i = 0; i < 14; i++) { const px = Math.random() * w, py = Math.random() * h, s = 5 + Math.random() * 6; x.beginPath(); x.moveTo(px - s, py); x.lineTo(px + s, py); x.moveTo(px, py - s); x.lineTo(px, py + s); x.stroke(); }
+      const H = 1.16, C = 2 * Math.PI * 0.2, ax = C / H; // texture is stretched by ax around the bottle
+      const skin = tex(1024, 1024, (x, w, h) => {
+        const gr = x.createLinearGradient(0, 0, 0, h);
+        gr.addColorStop(0, '#0a090c'); gr.addColorStop(0.42, '#0d0a10'); gr.addColorStop(0.6, '#3a1238');
+        gr.addColorStop(0.78, '#a3245f'); gr.addColorStop(1, '#ef4f97');
+        x.fillStyle = gr; x.fillRect(0, 0, w, h);
+        const gold = '#d9b45a';
+        // gold ornament on the upper front: an octagon framing a square with crossed lines
+        for (const cx of [0, w]) { x.save(); x.translate(cx, h * 0.3); x.scale(1 / ax, 1);
+        x.strokeStyle = gold; x.lineWidth = 6;
+        const oct = (r) => { x.beginPath(); for (let i = 0; i < 8; i++) { const a = Math.PI / 8 + (i / 8) * Math.PI * 2; x[i ? 'lineTo' : 'moveTo'](Math.cos(a) * r, Math.sin(a) * r); } x.closePath(); x.stroke(); };
+        x.scale(0.8, 0.8); oct(86); x.lineWidth = 3; oct(70);
+        x.lineWidth = 5; x.strokeRect(-34, -34, 68, 68);
+        x.beginPath(); x.moveTo(-34, -34); x.lineTo(34, 34); x.moveTo(34, -34); x.lineTo(-34, 34); x.stroke();
+        x.beginPath(); x.arc(0, 0, 12, 0, 7); x.stroke();
+        x.restore(); }
+        // name label near the base
+        for (const cx of [0, w]) { x.save(); x.translate(cx, h * 0.86); x.scale(1 / ax, 1);
+        x.fillStyle = '#0b0b0d'; x.fillRect(-170, -42, 340, 84);
+        x.strokeStyle = gold; x.lineWidth = 3; x.strokeRect(-162, -34, 324, 68);
+        x.fillStyle = gold; x.textAlign = 'center'; x.font = '600 34px Georgia'; x.fillText('STARRY NIGHTS', 0, 4);
+        x.font = '18px Georgia'; x.fillText('EAU DE PARFUM', 0, 26);
+        x.restore(); }
       });
-      const body = MT({ map: stars, metalness: 0.75, roughness: 0.22, clearcoat: 1, clearcoatRoughness: 0.05 });
-      const silver = M('#d8d9dc', { m: 1, r: 0.15 });
-      // body: lathe profile, flat base, soft shoulder, short neck
-      const prof = [[0, 0], [0.27, 0], [0.3, 0.02], [0.3, 0.9], [0.29, 0.95], [0.24, 1.0], [0.12, 1.03], [0.1, 1.06]].map(([r, y]) => new T.Vector2(r, y));
-      g.add(part(new T.LatheGeometry(prof, 96), body, [0, -0.7, 0]));
-      g.add(part(new T.CylinderGeometry(0.27, 0.27, 0.005, 64), M('#0c0d22', { m: 0.6, r: 0.3 }), [0, -0.7, 0]));
-      // silver collar, then the tall cap in the same starry finish with a silver top band
-      g.add(part(new T.CylinderGeometry(0.16, 0.16, 0.06, 64), silver, [0, 0.37, 0]));
-      g.add(part(new T.CylinderGeometry(0.2, 0.2, 0.36, 64), [body, silver, silver], [0, 0.58, 0]));
-      g.add(part(new T.CylinderGeometry(0.205, 0.205, 0.04, 64), silver, [0, 0.74, 0]));
-      g.add(part(new T.TorusGeometry(0.2, 0.012, 10, 64), silver, [0, 0.4, 0], [Math.PI / 2, 0, 0]));
-      g.userData.tilt = 0.12;
+      const glass = MT({ map: skin, metalness: 0.15, roughness: 0.12, clearcoat: 1, clearcoatRoughness: 0.03, envMapIntensity: 1.1 });
+      const gold = M('#d6b25e', { m: 1, r: 0.22 }), goldDark = M('#a8833a', { m: 1, r: 0.35 });
+      // bottle: lathe profile, then remap v to height so the gradient and decals sit right
+      const prof = [[0, 0], [0.18, 0], [0.2, 0.02], [0.2, 0.95], [0.196, 0.995], [0.18, 1.04], [0.145, 1.085], [0.1, 1.12], [0.082, 1.14], [0.08, H]]
+        .map(([r, y]) => new T.Vector2(r, y));
+      const geo = new T.LatheGeometry(prof, 120);
+      const pos = geo.attributes.position, uv = geo.attributes.uv;
+      for (let i = 0; i < pos.count; i++) uv.setY(i, pos.getY(i) / H);
+      g.add(part(geo, glass, [0, -0.7, 0]));
+      // gold spray pump: ribbed collar, neck ring, actuator with nozzle
+      const ribs = tex(256, 16, (x, w, h) => { for (let i = 0; i < w; i += 8) { x.fillStyle = '#fff'; x.fillRect(i, 0, 4, h); x.fillStyle = '#000'; x.fillRect(i + 4, 0, 4, h); } }, false);
+      const top = -0.7 + H;
+      g.add(part(new T.CylinderGeometry(0.11, 0.115, 0.13, 64), [MT({ color: '#d6b25e', metalness: 1, roughness: 0.3, bumpMap: ribs, bumpScale: 0.01 }), gold, gold], [0, top + 0.06, 0]));
+      g.add(part(new T.TorusGeometry(0.112, 0.01, 10, 48), gold, [0, top + 0.125, 0], [Math.PI / 2, 0, 0]));
+      g.add(part(new T.CylinderGeometry(0.03, 0.03, 0.05, 20), goldDark, [0, top + 0.15, 0]));
+      g.add(part(new T.CylinderGeometry(0.065, 0.065, 0.1, 48), gold, [0, top + 0.22, 0]));
+      g.add(part(new T.SphereGeometry(0.065, 32, 12, 0, Math.PI * 2, 0, Math.PI / 2), gold, [0, top + 0.27, 0], null, [1, 0.35, 1]));
+      g.add(part(new T.CylinderGeometry(0.012, 0.012, 0.01, 12), M('#111'), [0, top + 0.23, 0.064], [Math.PI / 2, 0, 0]));
+      g.userData.tilt = 0.1;
       return g;
     },
   };
