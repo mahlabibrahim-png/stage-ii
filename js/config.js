@@ -17,6 +17,8 @@ window.STAGE = {
   title: 'Stage II',
   // full-screen videos at the top of the home page; they take turns, switching every `heroHours` hours
   heroHours: 8,
+  // seasons in the menu; photos/years.json says which year each photo/video belongs to
+  seasons: [2021, 2022, 2023, 2024, 2025, 2026],
   heroes: [
     { video: 'photos/drone/hero.mp4', poster: 'photos/drone/hero-poster.jpg' },
     { video: 'photos/drone/hero-2.mp4', poster: 'photos/drone/hero-2-poster.jpg' },

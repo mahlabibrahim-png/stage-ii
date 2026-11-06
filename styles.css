@@ -53,6 +53,13 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 .menu a:hover, .menu a:focus-visible { background: var(--ink); color: var(--paper); outline: none; }
 .menu a[aria-current]::before { content: "→ "; }
 .menu .sep { height: 1px; margin: 6px 16px; background: var(--line); }
+.menu button { display: block; width: 100%; padding: 8px 16px; border: 0; background: none; color: inherit; text-align: left; font: 400 16px/1.2 var(--f-type); cursor: pointer; }
+.menu button:hover, .menu button:focus-visible { background: var(--ink); color: var(--paper); outline: none; }
+.season-toggle::after { content: " ▾"; font-size: 12px; }
+.season-toggle[aria-expanded="true"]::after { content: " ▴"; }
+.seasons ul { list-style: none; margin: 0; padding: 0 0 4px; }
+.seasons ul button { padding-left: 32px; font-size: 15px; }
+.menu button[aria-current]::before { content: "→ "; }
 
 main { position: relative; padding-left: var(--gutter-l); padding-right: var(--gutter-r); padding-top: 80px; }
 
@@ -79,6 +86,8 @@ body.over-video .menu-btn:hover { background: #ffffff; color: var(--ink); }
 
 /* ---------- tab page ---------- */
 #view-tab { max-width: 1200px; margin: 0 auto; padding-block: 8px 64px; display: grid; gap: 8px; }
+.tab-season { margin: -2px 0 0; min-height: 1em; text-align: center; font: 400 13px/1 var(--f-small); letter-spacing: 0.12em; color: var(--soft); }
+.tab-season:empty { display: none; }
 .tab-name { margin: 0; text-align: center; font: 400 clamp(36px, 7vw, 72px)/1 var(--f-type); text-wrap: balance; overflow-wrap: anywhere; }
 .tab-stage { width: 100%; max-width: 560px; aspect-ratio: 1 / 1; justify-self: center; cursor: grab; touch-action: pan-y; }
 .tab-stage:active { cursor: grabbing; }

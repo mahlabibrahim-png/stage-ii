@@ -121,7 +121,34 @@
       add(t.id, t.name);
     }
   }
-  const setMenu = (open) => { menu.hidden = !open; menuBtn.setAttribute('aria-expanded', String(open)); };
+  // seasons: All (the default, every visit) or one year
+  let season = 'all';
+  function buildSeasons() {
+    menu.append(Object.assign(document.createElement('li'), { className: 'sep', role: 'separator' }));
+    const li = document.createElement('li'); li.className = 'seasons';
+    const btn = Object.assign(document.createElement('button'), { type: 'button', className: 'season-toggle', textContent: 'Seasons' });
+    btn.setAttribute('aria-expanded', 'false');
+    const ul = document.createElement('ul'); ul.hidden = true;
+    const opts = ['all', ...(S.seasons || [])];
+    for (const y of opts) {
+      const b = Object.assign(document.createElement('button'), { type: 'button', textContent: y === 'all' ? 'All' : String(y) });
+      b.dataset.season = String(y);
+      b.addEventListener('click', () => { season = String(y); paintSeasons(); const t = byId[location.hash.slice(1)]; if (t) showTab(t, true); });
+      const o = document.createElement('li'); o.append(b); ul.append(o);
+    }
+    btn.addEventListener('click', (e) => { e.stopPropagation(); ul.hidden = !ul.hidden; btn.setAttribute('aria-expanded', String(!ul.hidden)); });
+    li.append(btn, ul); menu.append(li);
+    paintSeasons();
+  }
+  function paintSeasons() {
+    menu.querySelectorAll('[data-season]').forEach((b) => b.toggleAttribute('aria-current', b.dataset.season === season));
+    const tg = menu.querySelector('.season-toggle'); if (tg) tg.textContent = season === 'all' ? 'Seasons' : `Seasons · ${season}`;
+    document.body.dataset.season = season;
+  }
+  const setMenu = (open) => {
+    menu.hidden = !open; menuBtn.setAttribute('aria-expanded', String(open));
+    if (!open) { const ul = menu.querySelector('.seasons ul'), tg = menu.querySelector('.season-toggle'); if (ul) { ul.hidden = true; tg.setAttribute('aria-expanded', 'false'); } }
+  };
   menuBtn.addEventListener('click', (e) => { e.stopPropagation(); setMenu(menu.hidden); });
   menu.addEventListener('click', () => setMenu(false));
   document.addEventListener('click', (e) => { if (!menu.hidden && !e.target.closest('.menu-wrap')) setMenu(false); });
@@ -219,11 +246,15 @@
   window.addEventListener('resize', () => { fitMain(); updateMain(); });
 
   let unmount = null;
-  function showTab(t) {
+  function showTab(t, keepScroll) {
     $('#tab-name').textContent = t.name;
-    const media = mediaOf(t), gal = $('#gallery');
+    const all = mediaOf(t), gal = $('#gallery');
+    // a chosen season keeps only that year's photos and videos (main still opens the section)
+    const media = season === 'all' ? all : all.filter((m) => String((t.years || {})[m.file]) === season);
     gal.innerHTML = '';
     media.forEach((m) => gal.append(entry(m, media)));
+    $('#tab-season').textContent = season === 'all' ? '' : season;
+    if (keepScroll) return;
     setMain(t);
     if (unmount) unmount();
     $('#tab-stage').classList.toggle('duo', !!t.actor);
@@ -250,12 +281,14 @@
       if (Array.isArray(m)) { if (m.length) t.media = m; continue; }
       if (!m) continue;
       if (m.main) t.main = m.main;
+      if (m.years) t.years = m.years;
       if (m.media && (m.media.length || m.main)) t.media = m.media;
     }
   }
 
   window.Objects.init();
   buildMenu();
+  buildSeasons();
   buildHero();
   buildHome();
   window.addEventListener('hashchange', route);

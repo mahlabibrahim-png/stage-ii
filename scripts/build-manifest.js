@@ -14,5 +14,10 @@ for (const dir of fs.readdirSync(root, { withFileTypes: true })) {
   const main = files.find((f) => /^main\./i.test(f));
   out[dir.name] = { main: main || null, media: files.filter((f) => f !== main) };
 }
+// photos/years.json says which season (year) each photo/video is from: { "<tab>": { "01.jpg": 2025 } }
+try {
+  const years = JSON.parse(fs.readFileSync(path.join(root, 'years.json'), 'utf8'));
+  for (const [k, v] of Object.entries(years)) if (out[k]) out[k].years = v;
+} catch (e) { /* no years file yet */ }
 fs.writeFileSync(path.join(root, 'manifest.json'), JSON.stringify(out, null, 2));
 console.log('manifest:', Object.entries(out).map(([k, v]) => `${k} ${v.media.length}${v.main ? '+main' : ''}`).join(', '));
