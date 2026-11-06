@@ -59,21 +59,21 @@ window.STAGE = {
       id: 'tareq', group: 'member', name: 'Teeka', object: 'gloves', actor: 'box', color: '#ff8f8f',
       media: [],
       text: {
-        '01.jpg': "02/01/06\n\nA true rags-to-riches story: he knocked himself down and came back better than ever. Willpower and grit like no other, and as real as they come. A fine linguist; you will never beat him with words. Funny, with a hint of psycho. Follow Teeka, but don’t cross him. You don’t want to see the other side.",
+        '01.jpg': "02/01/06 · Cairo\n\nA true rags-to-riches story: he knocked himself down and came back better than ever. Willpower and grit like no other, and as real as they come. A fine linguist; you will never beat him with words. Funny, with a hint of psycho. Follow Teeka, but don’t cross him. You don’t want to see the other side.\n\n— Tareq Barakat",
       },
     },
     {
       id: 'belal', group: 'member', name: 'Nosseir', object: 'angel', actor: 'mac', color: '#ffb3e6',
       media: [],
       text: {
-        '01.jpg': "12/31/04\n\nThe entrepreneur: businessman, e-commerce, and the most effortless athlete you’ll ever meet. As fun and loyal as they come, always a step ahead with his eyes on the prize. Ruthless, with a big heart. Watch and learn, ladies and gentlemen.",
+        '01.jpg': "12/31/04 · Cairo\n\nThe entrepreneur: businessman, e-commerce, and the most effortless athlete you’ll ever meet. As fun and loyal as they come, always a step ahead with his eyes on the prize. Ruthless, with a big heart. Watch and learn, ladies and gentlemen.\n\n— Belal Nosseir",
       },
     },
     {
       id: 'ibrahim', group: 'member', name: 'Hemi', object: 'hemi', actor: 'bench', color: '#ffbe6b',
       media: [],
       text: {
-        '01.mp4': "08/06/06\n\nThe big one, the one who holds them together. Strength, endurance and intellect. He’ll find a solution to any problem, make you laugh until it hurts, and follow you to the grave if he has to.",
+        '01.mp4': "08/06/06 · Boston & Cairo\n\nThe big one, the one who holds them together. Strength, endurance and intellect. He’ll find a solution to any problem, make you laugh until it hurts, and follow you to the grave if he has to.\n\n— Ibrahim Mahlab",
       },
     },
     {
