@@ -76,7 +76,7 @@ window.STAGE = {
       id: 'mahmoud', group: 'member', name: 'Doodo', object: 'goggles', actor: 'swim', color: '#6fe9ff',
       media: [],
       text: {
-        '01.jpg': "27.4186° N, 33.6631° E\n\n04/29/06 · Michigan & Cairo\n\nMr. Nonchalant, and the most athletic of the group. A Division II All-American swimmer and a future AI guru: serious, with a taste of stupidity. Come to be inspired and to laugh, all at once.\n\n— Mahmoud El Walid",
+        '01.jpg': "27.4186° N, 33.6631° E\n\n04/29/06 · Michigan & Cairo\n\nMr. Nonchalant, and the most athletic of the group. A Division II All-American swimmer and a future AI guru: serious, with a taste of stupidity. Come to be inspired and to laugh, all at once.\n\n— M.E.W",
         '02.jpg': "27.4122° N, 33.6770° E\n\nTwo of the fittest in the pride, after a workout on the beach.",
       },
     },
@@ -84,7 +84,7 @@ window.STAGE = {
       id: 'muhammad', group: 'member', name: 'Dodo', object: 'drawing', actor: 'draw', color: '#a9c8ff',
       media: [],
       text: {
-        '01.mp4': "~27.40° N, 33.67° E · December 2024\n\n08/08/06 · Brighton & Cairo\n\nArchitect, entrepreneur, visionary, and proudly an “idiot.” The most electric, outgoing and funniest of the pride. Follow Dodo’s adventures for a laugh you won’t want to miss.\n\n— Muhammad Nada",
+        '01.mp4': "~27.40° N, 33.67° E · December 2024\n\n08/08/06 · Brighton & Cairo\n\nArchitect, entrepreneur, visionary, and proudly an “idiot.” The most electric, outgoing and funniest of the pride. Follow Dodo’s adventures for a laugh you won’t want to miss.\n\n— M.N",
         '02.mp4': "~27.48° N, 33.92° E · June 2026\n\nClimbing aboard from the crystal shallows.",
         '03.mp4': "~27.40° N, 33.67° E · June 2026\n\nA crab caught by hand, and presented with great pride.",
         '04.jpg': "~27.40° N, 33.67° E · July 2026\n\nVictory, for reasons unknown.",
@@ -96,7 +96,7 @@ window.STAGE = {
       id: 'tareq', group: 'member', name: 'Teeka', object: 'gloves', actor: 'box', color: '#ff8f8f',
       media: [],
       text: {
-        '01.jpg': "~27.48° N, 33.92° E · July 2024\n\n02/01/06 · Cairo\n\nA true rags-to-riches story: he knocked himself down and came back better than ever. Willpower and grit like no other, and as real as they come. A fine linguist; you will never beat him with words. Funny, with a hint of psycho. Follow Teeka, but don’t cross him. You don’t want to see the other side.\n\n— Tareq Barakat",
+        '01.jpg': "~27.48° N, 33.92° E · July 2024\n\n02/01/06 · Cairo\n\nA true rags-to-riches story: he knocked himself down and came back better than ever. Willpower and grit like no other, and as real as they come. A fine linguist; you will never beat him with words. Funny, with a hint of psycho. Follow Teeka, but don’t cross him. You don’t want to see the other side.\n\n— T.B",
         '02.mp4': "~27.40° N, 33.67° E · June 2026\n\nDusk settles over the road home.",
         '03.jpg': "~27.40° N, 33.67° E · July 2026\n\nA kingfish, and a crew too proud to stop smiling.",
         '04.jpg': "~27.40° N, 33.67° E · July 2026\n\nHanding over the prize, mid-sea.",
@@ -106,7 +106,7 @@ window.STAGE = {
       id: 'belal', group: 'member', name: 'Nosseir', object: 'angel', actor: 'mac', color: '#ffb3e6',
       media: [],
       text: {
-        '01.jpg': "~27.40° N, 33.67° E · June 2025\n\n12/31/04 · Cairo\n\nThe entrepreneur: businessman, e-commerce, and the most effortless athlete you’ll ever meet. As fun and loyal as they come, always a step ahead with his eyes on the prize. Ruthless, with a big heart. Watch and learn, ladies and gentlemen.\n\n— Belal Nosseir",
+        '01.jpg': "~27.40° N, 33.67° E · June 2025\n\n12/31/04 · Cairo\n\nThe entrepreneur: businessman, e-commerce, and the most effortless athlete you’ll ever meet. As fun and loyal as they come, always a step ahead with his eyes on the prize. Ruthless, with a big heart. Watch and learn, ladies and gentlemen.\n\n— B.N",
         '02.jpg': "~27.40° N, 33.67° E\n\nStanding tall on deck, the sea behind him.",
       },
     },
@@ -114,7 +114,7 @@ window.STAGE = {
       id: 'ibrahim', group: 'member', name: 'Hemi', object: 'hemi', actor: 'bench', color: '#ffbe6b',
       media: [],
       text: {
-        '01.mp4': "~27.48° N, 33.92° E · June 2026\n\n08/06/06 · Boston & Cairo\n\nThe big one, the one who holds them together. Strength, endurance and intellect. He’ll find a solution to any problem, make you laugh until it hurts, and follow you to the grave if he has to.\n\n— Ibrahim Mahlab",
+        '01.mp4': "~27.48° N, 33.92° E · June 2026\n\n08/06/06 · Boston & Cairo\n\nThe big one, the one who holds them together. Strength, endurance and intellect. He’ll find a solution to any problem, make you laugh until it hurts, and follow you to the grave if he has to.\n\n— I.M",
         '02.jpg': "~27.40° N, 33.67° E\n\nBucket hat, lagoon breeze, a lazy afternoon on the water.",
         '03.jpg': "27.4590° N, 33.8720° E\n\nHoodies on and the wind up, far out on the Red Sea.",
         '04.jpg': "27.4161° N, 33.6637° E\n\nOne last selfie as the lagoon turns pink.",
@@ -124,7 +124,7 @@ window.STAGE = {
       id: 'bilal', group: 'member', name: 'Bilo', object: 'perfume', actor: 'spray', color: '#6fffc8',
       media: [],
       text: {
-        '01.jpg': "~27.40° N, 33.67° E · January 2024\n\n02/27/06\n\nEnergy and discipline like no other, and fun like no other. Unmatched athleticism, charisma and intellect, carried by an infectious smile. The guy you want to be around, and the one who will never leave you when you’re in need.\n\n— Bilal Sultan",
+        '01.jpg': "~27.40° N, 33.67° E · January 2024\n\n02/27/06 · Cairo & Barcelona\n\nEnergy and discipline like no other, and fun like no other. Unmatched athleticism, charisma and intellect, carried by an infectious smile. The guy you want to be around, and the one who will never leave you when you’re in need.\n\n— B.S",
         '02.jpg': "~27.40° N, 33.67° E · July 2026\n\nThe catch of the day, held high above the wake.",
         '03.jpg': "~27.40° N, 33.67° E\n\nFour smiles, one frame.",
         '04.jpg': "27.4837° N, 33.9219° E\n\nCurls, sunshine and a grin, far out at sea.",
