@@ -1,9 +1,8 @@
 /* Astralaga: drop the font file into fonts/ (any of these names) and it takes over everywhere. */
 @font-face {
   font-family: "Astralaga";
-  src: url("fonts/Astralaga.woff2") format("woff2"), url("fonts/Astralaga.woff") format("woff"),
-       url("fonts/Astralaga.otf") format("opentype"), url("fonts/Astralaga.ttf") format("truetype");
-  font-display: swap;
+  src: url("fonts/Astralaga.ttf") format("truetype");
+  font-display: block; /* never flash the fallback font: wait (preloaded in index.html) */
 }
 /* Layout: a white room. The objects carry all the colour; type is black typewriter, kept to a minimum. */
 :root {
