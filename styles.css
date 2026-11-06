@@ -100,6 +100,7 @@ body.over-video .menu-btn:hover { background: #ffffff; color: var(--ink); }
 .entry .frame img, .entry .frame video { position: static; width: auto; max-width: 100%; height: auto; max-height: 82vh; object-fit: contain; }
 .entry .slot { position: static; padding: 40% 0; text-align: center; }
 .entry-text { font: 400 clamp(15px, 1.3vw, 18px)/1.6 var(--f-small); color: var(--ink); white-space: pre-line; }
+.entry-text .coords { display: block; margin: 0 0 14px; font-size: 12px; letter-spacing: 0.08em; color: var(--soft); }
 .entry-text .ph { display: block; height: 10px; margin: 0 0 14px; background: var(--line); }
 .entry-text .ph:nth-child(1) { width: 78%; } .entry-text .ph:nth-child(2) { width: 92%; } .entry-text .ph:nth-child(3) { width: 54%; }
 @media (max-width: 760px) {

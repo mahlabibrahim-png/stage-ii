@@ -29,7 +29,12 @@
     const txt = document.createElement('div');
     txt.className = 'entry-text';
     const words = m.tab.text && m.tab.text[m.file];
-    if (words) txt.textContent = words;
+    if (words) {
+      // a first line of coordinates (e.g. "27.42° N, 33.66° E · June 2025") is set apart above the words
+      const m = words.match(/^(~?\d+(?:\.\d+)?° [NS], \d+(?:\.\d+)?° [EW][^\n]*)\n+/);
+      if (m) txt.append(Object.assign(document.createElement('span'), { className: 'coords', textContent: m[1] }));
+      txt.append(document.createTextNode(m ? words.slice(m[0].length) : words));
+    }
     else for (let i = 0; i < 3; i++) txt.append(Object.assign(document.createElement('span'), { className: 'ph' }));
     a.append(f, txt);
     return a;
