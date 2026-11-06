@@ -5,7 +5,7 @@ const fs = require('fs');
 const path = require('path');
 const root = path.join(__dirname, '..', 'photos');
 const ok = /\.(jpe?g|png|webp|gif|avif|mp4|webm|mov|m4v)$/i;
-const skip = /^hero(-poster)?\./i; // the home page video lives here too
+const skip = /^hero(-\d+)?(-poster)?\./i; // the home page video lives here too
 const out = {};
 for (const dir of fs.readdirSync(root, { withFileTypes: true })) {
   if (!dir.isDirectory()) continue;

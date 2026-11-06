@@ -11,7 +11,7 @@ Static site, no build step. Open `index.html` through any static host (or `pytho
 Tip: resize photos to about 2000px on the long side and keep clips short (under ~20 MB) so the site stays fast.
 
 ## Top video
-The home page opens with `photos/drone/hero.mp4` (set in `js/config.js` as `hero`). To swap it, convert the clip to a web-friendly mp4, for example:
+The home page opens with one of the `heroes` videos in `js/config.js` (photos/drone/hero.mp4, hero-2.mp4, hero-3.mp4), switching every `heroHours` (8) hours. To swap it, convert the clip to a web-friendly mp4, for example:
 `ffmpeg -i clip.mov -an -vf scale=1920:-2 -c:v libx264 -crf 24 -pix_fmt yuv420p -movflags +faststart photos/drone/hero.mp4`
 
 ## Adding a new collection

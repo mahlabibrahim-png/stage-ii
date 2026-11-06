@@ -15,9 +15,13 @@
    ============================================================ */
 window.STAGE = {
   title: 'Stage II',
-  // full-screen video at the top of the home page
-  hero: 'photos/drone/hero.mp4',
-  heroPoster: 'photos/drone/hero-poster.jpg',
+  // full-screen videos at the top of the home page; they take turns, switching every `heroHours` hours
+  heroHours: 8,
+  heroes: [
+    { video: 'photos/drone/hero.mp4', poster: 'photos/drone/hero-poster.jpg' },
+    { video: 'photos/drone/hero-2.mp4', poster: 'photos/drone/hero-2-poster.jpg' },
+    { video: 'photos/drone/hero-3.mp4', poster: 'photos/drone/hero-3-poster.jpg' },
+  ],
   tabs: [
     {
       id: 'drone', group: 'collection', name: 'Drone', object: 'drone', color: '#8fe3ff',

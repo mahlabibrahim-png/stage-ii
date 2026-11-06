@@ -139,10 +139,13 @@
 
   function buildHero() {
     const hero = $('#hero'), v = $('#hero-video');
-    if (!S.hero) { hero.hidden = true; return; }
+    const list = S.heroes || (S.hero ? [{ video: S.hero, poster: S.heroPoster }] : []);
+    if (!list.length) { hero.hidden = true; return; }
+    // everyone sees the same intro video, and it changes every heroHours hours
+    const pick = list[Math.floor(Date.now() / ((S.heroHours || 8) * 3600e3)) % list.length];
     v.addEventListener('loadeddata', () => { hero.classList.add('loaded'); v.play().catch(() => {}); }, { once: true });
-    if (S.heroPoster) v.poster = S.heroPoster;
-    v.src = S.hero;
+    if (pick.poster) v.poster = pick.poster;
+    v.src = pick.video;
     // the video fades out (and drifts back slightly) as you scroll, revealing the objects underneath
     let ticking = false;
     const update = () => {
