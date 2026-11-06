@@ -59,7 +59,7 @@ window.STAGE = {
       id: 'film', group: 'collection', name: 'Film', object: 'camera', color: '#d9dadc', center: true,
       media: [],
       text: {
-        '01.mp4': "27.4296° N, 33.6601° E · December 2024\n\nDear visitor,\n\nWelcome to Stage II. Here you will meet the six members of a rare pride of young lions. Follow us through our adventures, and take your fill of the laughter and mischief we gather along the way.\n\nConsider this our gift: a small offering of joy, and a taste of freedom for anyone who cares to share it.\n\n— Stage II",
+        '01.mp4': "27.4296° N, 33.6601° E · December 2024\n\nDear visitor,\n\nWelcome to Stage II. Here you will meet the seven members of a rare pride of young lions. Follow us through our adventures, and take your fill of the laughter and mischief we gather along the way.\n\nConsider this our gift: a small offering of joy, and a taste of freedom for anyone who cares to share it.\n\n— Stage II",
         '02.mp4': "~27.40° N, 33.67° E · July 2024\n\nThe sun sinks into the lagoon as we drift home.",
         '03.jpg': "~27.48° N, 33.92° E · December 2024\n\nA barbecue on white sand: cold drinks, hot coals and nowhere else to be.",
         '04.mp4': "~27.40° N, 33.67° E · June 2026\n\nAn evening swim as the lights come on along the shore.",
@@ -129,6 +129,10 @@ window.STAGE = {
         '03.jpg': "~27.40° N, 33.67° E\n\nFour smiles, one frame.",
         '04.jpg': "27.4837° N, 33.9219° E\n\nCurls, sunshine and a grin, far out at sea.",
       },
+    },
+    {
+      id: 'selim', group: 'member', name: 'Kika', object: 'huracan', color: '#2f6b4a',
+      media: [],
     },
   ],
 };

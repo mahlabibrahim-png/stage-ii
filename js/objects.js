@@ -513,6 +513,86 @@
       return g;
     },
 
+    // Off-road supercar (Huracán Sterrato style, no badges): dark green paint, raised stance, black flares,
+    // all-terrain tyres, roof scoop and rails, light bar, Y headlights, hexagon tail lights, high twin exhausts.
+    huracan({ M, MT, part, tex, rbox }) {
+      const g = new T.Group();
+      const paint = MT({ color: '#1d3a2a', metalness: 0.55, roughness: 0.32, clearcoat: 1, clearcoatRoughness: 0.06 });
+      const black = M('#121313', { r: 0.7 }), gloss = M('#0c0c0d', { r: 0.25, cc: 1 }), alu = M('#b9bcbf', { m: 1, r: 0.3 });
+      const glass = MT({ color: '#0d1114', metalness: 0.2, roughness: 0.05, clearcoat: 1, envMapIntensity: 1.4 });
+      const lamp = new T.MeshBasicMaterial({ color: 0xf4f7ff, toneMapped: false }), red = new T.MeshBasicMaterial({ color: 0xd8121c, toneMapped: false });
+      // side profile (z = length, y = height) extruded across the width
+      const side = (pts, w, bevel, taper) => {
+        const s = new T.Shape(); pts.forEach(([z, y], i) => (i ? s.lineTo(z, y) : s.moveTo(z, y)));
+        const geo = new T.ExtrudeGeometry(s, { depth: w - 2 * bevel, bevelEnabled: true, bevelSize: bevel, bevelThickness: bevel, bevelSegments: 5, curveSegments: 12 });
+        geo.translate(0, 0, -(w - 2 * bevel) / 2); geo.rotateY(-Math.PI / 2);
+        if (taper) { const p = geo.attributes.position; for (let i = 0; i < p.count; i++) p.setX(i, p.getX(i) * taper(p.getY(i), p.getZ(i))); geo.computeVertexNormals(); }
+        return geo;
+      };
+      // plan-view taper (narrower nose and tail) and tumblehome (narrower towards the top)
+      const bodyTaper = (y, z) => (1 - 0.1 * Math.max(0, (y - 0.42) / 0.6)) * (1 - 0.16 * Math.pow(Math.max(0, (Math.abs(z) - 1.2) / 1.1), 2));
+      g.add(part(side([[-2.2, 0.42], [2.1, 0.42], [2.3, 0.52], [2.3, 0.62], [2.2, 0.73], [1.6, 0.84], [0.85, 0.96], [-0.2, 1.0], [-1.55, 1.0], [-2.15, 0.98], [-2.28, 0.86], [-2.26, 0.55]], 1.92, 0.1, bodyTaper), paint));
+      // cabin: dark glass, with a body-colour roof, A-pillars and engine cover
+      const cabinTaper = (y) => 1 - 0.32 * Math.max(0, (y - 0.94) / 0.4);
+      g.add(part(side([[0.85, 0.94], [0.02, 1.31], [-0.65, 1.33], [-1.55, 1.04], [-1.6, 0.98], [0.8, 0.94]], 1.62, 0.08, cabinTaper), glass));
+      g.add(part(side([[0.05, 1.315], [-0.65, 1.35], [-1.0, 1.255], [-0.62, 1.3], [0.04, 1.295]], 1.14, 0.03), paint));
+      g.add(part(side([[-1.0, 1.24], [-1.58, 1.05], [-2.1, 1.0], [-2.1, 0.98], [-1.0, 1.1]], 1.6, 0.05), paint));
+      for (const s of [-1, 1]) g.add(part(new T.BoxGeometry(0.06, 0.05, 0.95), paint, [s * 0.71, 1.13, 0.43], [0.42, 0, 0]));
+      // roof scoop and rails
+      g.add(part(rbox(0.36, 0.12, 0.62, 0.05), paint, [0, 1.41, -0.62], [-0.05, 0, 0]));
+      g.add(part(new T.BoxGeometry(0.28, 0.07, 0.02), black, [0, 1.41, -0.31]));
+      for (const s of [-1, 1]) g.add(part(new T.CylinderGeometry(0.018, 0.018, 0.75, 10), black, [s * 0.5, 1.38, -0.3], [Math.PI / 2 - 0.04, 0, 0]));
+      // engine-cover louvres
+      for (let i = 0; i < 6; i++) g.add(part(new T.BoxGeometry(1.1, 0.012, 0.04), black, [0, 1.05 - i * 0.008, -1.25 - i * 0.12]));
+      // black fender flares, side skirts, side intakes, mirrors
+      const axles = [1.42, -1.38], R = 0.4;
+      for (const z of axles) for (const s of [-1, 1]) {
+        g.add(part(new T.TorusGeometry(R + 0.07, 0.075, 10, 32, Math.PI), black, [s * 0.95, 0.42, z], [0, Math.PI / 2, 0], [1, 1, 1.4]));
+        g.add(part(new T.CylinderGeometry(R + 0.02, R + 0.02, 0.1, 32, 1, false, 0, Math.PI), M('#050505', { r: 0.9 }), [s * 0.9, 0.42, z], [0, 0, Math.PI / 2]));
+      }
+      for (const s of [-1, 1]) {
+        g.add(part(new T.BoxGeometry(0.08, 0.12, 1.9), black, [s * 0.97, 0.45, 0.02]));
+        g.add(part(new T.BoxGeometry(0.04, 0.24, 0.5), M('#060606', { r: 0.6 }), [s * 0.97, 0.72, -0.72], [0, 0, 0]));
+        g.add(part(new T.BoxGeometry(0.22, 0.09, 0.05), paint, [s * 0.93, 1.06, 0.62]));
+        g.add(part(new T.BoxGeometry(0.03, 0.03, 0.08), black, [s * 0.84, 1.03, 0.62]));
+      }
+      // wheels: chunky all-terrain tyres, black multi-spoke rims, hubs
+      const tread = tex(512, 32, (x, w, h) => { x.fillStyle = '#000'; x.fillRect(0, 0, w, h); x.fillStyle = '#fff'; for (let i = 0; i < w; i += 16) { x.fillRect(i, (i / 16) % 2 ? 0 : 10, 9, 22); } }, false);
+      tread.repeat.set(1, 1);
+      const tyre = MT({ color: '#151515', roughness: 0.9, bumpMap: tread, bumpScale: 0.04 });
+      const rim = M('#1f2021', { m: 0.7, r: 0.35 }), wheels = [];
+      for (const z of axles) for (const s of [-1, 1]) {
+        const w = new T.Group(); w.position.set(s * 0.95, 0.4, z);
+        w.add(part(new T.CylinderGeometry(R, R, 0.32, 48), [tyre, M('#141414', { r: 0.85 }), M('#141414', { r: 0.85 })], [0, 0, 0], [0, 0, Math.PI / 2]));
+        w.add(part(new T.TorusGeometry(R - 0.03, 0.035, 10, 48), M('#141414', { r: 0.85 }), [s * 0.16, 0, 0], [0, Math.PI / 2, 0]));
+        w.add(part(new T.CylinderGeometry(0.25, 0.25, 0.04, 40), rim, [s * 0.15, 0, 0], [0, 0, Math.PI / 2]));
+        for (let k = 0; k < 10; k++) { const a = (k / 10) * Math.PI * 2; w.add(part(new T.BoxGeometry(0.03, 0.2, 0.035), alu, [s * 0.175, Math.cos(a) * 0.12, Math.sin(a) * 0.12], [a, 0, 0])); }
+        w.add(part(new T.CylinderGeometry(0.05, 0.05, 0.04, 20), alu, [s * 0.18, 0, 0], [0, 0, Math.PI / 2]));
+        g.add(w); wheels.push(w);
+      }
+      // front: Y headlights, roof light bar, skid plate, intakes
+      for (const s of [-1, 1]) {
+        g.add(part(new T.BoxGeometry(0.34, 0.03, 0.03), lamp, [s * 0.52, 0.715, 2.235], [0, -s * 0.35, 0]));
+        g.add(part(new T.BoxGeometry(0.025, 0.12, 0.03), lamp, [s * 0.67, 0.66, 2.24], [0, -s * 0.35, s * 0.5]));
+        g.add(part(new T.BoxGeometry(0.34, 0.12, 0.05), M('#070707', { r: 0.5 }), [s * 0.48, 0.55, 2.3], [0, -s * 0.3, 0]));
+      }
+
+      g.add(part(new T.BoxGeometry(1.0, 0.035, 0.06), black, [0, 1.385, 0.0]));
+      g.add(part(new T.BoxGeometry(0.92, 0.015, 0.02), lamp, [0, 1.385, 0.035]));
+      g.add(part(new T.BoxGeometry(1.2, 0.04, 0.4), alu, [0, 0.42, 2.12], [0.35, 0, 0]));
+      // rear: hexagon tail lights, black panel, high twin exhausts, rear skid
+      g.add(part(new T.BoxGeometry(1.7, 0.3, 0.04), gloss, [0, 0.74, -2.27]));
+      for (const s of [-1, 1]) {
+        const hex = new T.Mesh(new T.CylinderGeometry(0.09, 0.09, 0.02, 6), red); hex.rotation.set(Math.PI / 2, 0, 0); hex.position.set(s * 0.6, 0.8, -2.295); g.add(hex);
+        g.add(part(new T.BoxGeometry(0.34, 0.03, 0.02), red, [s * 0.45, 0.88, -2.29]));
+        g.add(part(new T.CylinderGeometry(0.055, 0.06, 0.12, 24, 1, true), M('#5b5d60', { m: 1, r: 0.25, ds: 1 }), [s * 0.12, 0.98, -2.15], [Math.PI / 2 - 0.2, 0, 0]));
+      }
+      g.add(part(new T.BoxGeometry(1.3, 0.05, 0.35), alu, [0, 0.43, -2.15], [-0.3, 0, 0]));
+      g.userData.tilt = 0.22;
+      g.userData.tick = (t) => { /* parked: wheels still */ };
+      return g;
+    },
+
     // Starry Nights flask: glossy black fading to magenta-pink at the base, gold ornament, black/gold name label, gold spray pump.
     perfume({ M, MT, part, tex }) {
       const g = new T.Group();

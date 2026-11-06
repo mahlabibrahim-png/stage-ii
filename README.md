@@ -16,7 +16,7 @@ The home page opens with one of the `heroes` videos in `js/config.js` (photos/dr
 
 ## Adding a new collection
 Copy an entry in `js/config.js`, give it a new `id`, `name` and an `object`.
-Available objects: drone, wakeboard, camera (movie camera), perfume, goggles, drawing, gloves, angel, hemi, tank. Add `center: true` to a tab to put its object in the middle of the wheel (Film does this).
+Available objects: drone, wakeboard, camera (movie camera), perfume, huracan, goggles, drawing, gloves, angel, hemi, tank. Add `center: true` to a tab to put its object in the middle of the wheel (Film does this).
 Seasons: `photos/years.json` maps each file to the year it was taken (`{"bilal": {"01.jpg": 2024}}`); picking a season in the menu shows only that year (main always shows). Files without a year only show under All.
 People pages can also show a little animated guy next to the object: set `actor` in `js/config.js` (spray, box, bench, draw, swim, mac; see ACTORS in `js/objects.js`).
 A new object is one builder function in `js/objects.js` (BUILDERS).
