@@ -106,48 +106,58 @@
 
   /* ---------- dropdown menu ---------- */
   const menuBtn = $('#menu-btn'), menu = $('#menu');
+  const sep = () => menu.append(Object.assign(document.createElement('li'), { className: 'sep', role: 'separator' }));
+  const link = (id, label) => {
+    const li = document.createElement('li'), a = document.createElement('a');
+    a.href = `#${id}`; a.textContent = label; a.dataset.id = id;
+    li.append(a); return li;
+  };
+  // a fold-out group inside the menu (Members, Seasons)
+  function group(label, cls) {
+    const li = document.createElement('li'); li.className = `sub ${cls}`;
+    const btn = Object.assign(document.createElement('button'), { type: 'button', className: 'sub-toggle', textContent: label });
+    btn.setAttribute('aria-expanded', 'false');
+    const ul = document.createElement('ul'); ul.hidden = true;
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const open = ul.hidden;
+      menu.querySelectorAll('.sub ul').forEach((u) => { u.hidden = true; u.previousSibling.setAttribute('aria-expanded', 'false'); });
+      ul.hidden = !open; btn.setAttribute('aria-expanded', String(open));
+    });
+    li.append(btn, ul); menu.append(li);
+    return { btn, ul };
+  }
   function buildMenu() {
-    const add = (id, label) => {
-      const li = document.createElement('li');
-      const a = document.createElement('a');
-      a.href = `#${id}`; a.textContent = label; a.dataset.id = id;
-      li.append(a); menu.append(li);
-    };
-    add('home', 'All');
-    let lastGroup = null;
-    for (const t of tabs) {
-      if (lastGroup && t.group !== lastGroup) menu.append(Object.assign(document.createElement('li'), { className: 'sep', role: 'separator' }));
-      lastGroup = t.group;
-      add(t.id, t.name);
+    menu.append(link('home', 'All'));
+    for (const t of tabs.filter((x) => x.group !== 'member')) menu.append(link(t.id, t.name));
+    const members = tabs.filter((x) => x.group === 'member');
+    if (members.length) {
+      sep();
+      const g = group('Members', 'members');
+      for (const t of members) g.ul.append(link(t.id, t.name));
     }
   }
   // seasons: All (the default, every visit) or one year
   let season = 'all';
   function buildSeasons() {
-    menu.append(Object.assign(document.createElement('li'), { className: 'sep', role: 'separator' }));
-    const li = document.createElement('li'); li.className = 'seasons';
-    const btn = Object.assign(document.createElement('button'), { type: 'button', className: 'season-toggle', textContent: 'Seasons' });
-    btn.setAttribute('aria-expanded', 'false');
-    const ul = document.createElement('ul'); ul.hidden = true;
-    const opts = ['all', ...(S.seasons || [])];
-    for (const y of opts) {
+    sep();
+    const g = group('Seasons', 'seasons');
+    for (const y of ['all', ...(S.seasons || [])]) {
       const b = Object.assign(document.createElement('button'), { type: 'button', textContent: y === 'all' ? 'All' : String(y) });
       b.dataset.season = String(y);
       b.addEventListener('click', () => { season = String(y); paintSeasons(); const t = byId[location.hash.slice(1)]; if (t) showTab(t, true); });
-      const o = document.createElement('li'); o.append(b); ul.append(o);
+      const o = document.createElement('li'); o.append(b); g.ul.append(o);
     }
-    btn.addEventListener('click', (e) => { e.stopPropagation(); ul.hidden = !ul.hidden; btn.setAttribute('aria-expanded', String(!ul.hidden)); });
-    li.append(btn, ul); menu.append(li);
     paintSeasons();
   }
   function paintSeasons() {
     menu.querySelectorAll('[data-season]').forEach((b) => b.toggleAttribute('aria-current', b.dataset.season === season));
-    const tg = menu.querySelector('.season-toggle'); if (tg) tg.textContent = season === 'all' ? 'Seasons' : `Seasons · ${season}`;
+    const tg = menu.querySelector('.seasons .sub-toggle'); if (tg) tg.textContent = season === 'all' ? 'Seasons' : `Seasons · ${season}`;
     document.body.dataset.season = season;
   }
   const setMenu = (open) => {
     menu.hidden = !open; menuBtn.setAttribute('aria-expanded', String(open));
-    if (!open) { const ul = menu.querySelector('.seasons ul'), tg = menu.querySelector('.season-toggle'); if (ul) { ul.hidden = true; tg.setAttribute('aria-expanded', 'false'); } }
+    if (!open) menu.querySelectorAll('.sub ul').forEach((u) => { u.hidden = true; u.previousSibling.setAttribute('aria-expanded', 'false'); });
   };
   menuBtn.addEventListener('click', (e) => { e.stopPropagation(); setMenu(menu.hidden); });
   menu.addEventListener('click', () => setMenu(false));
