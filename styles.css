@@ -46,7 +46,7 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 .menu-btn:hover { background: var(--ink); color: var(--paper); }
 .menu {
   position: absolute; right: 0; top: calc(100% + 6px); z-index: 9; min-width: 12em;
-  margin: 0; padding: 6px 0; list-style: none; background: var(--paper); border: 1px solid var(--ink);
+  margin: 0; padding: 6px 0; list-style: none; background: var(--paper); color: var(--ink); border: 1px solid var(--ink);
   box-shadow: 4px 4px 0 var(--ink);
 }
 .menu a { display: block; padding: 8px 16px; font: 400 16px/1.2 var(--f-type); text-decoration: none; }
