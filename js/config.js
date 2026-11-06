@@ -22,10 +22,16 @@ window.STAGE = {
     {
       id: 'drone', group: 'collection', name: 'Drone', object: 'drone', color: '#8fe3ff',
       media: [],
+      text: {
+        '01.jpg': "See it the way we do: from the sky.\n\nRise with us over the quiet beauty of Egypt, its coastlines, deserts and lagoons, and enjoy the ride.",
+      },
     },
     {
       id: 'wake', group: 'collection', name: 'Wake', object: 'wakeboard', color: '#7dffd4',
       media: [],
+      text: {
+        '01.mp4': "Our favourite pastime.\n\nThe cleanest tricks, the funniest falls and the finest sunsets, all on the lagoons of El Gouna.",
+      },
     },
     {
       // center: true puts this object in the middle of the home wheel
@@ -38,26 +44,44 @@ window.STAGE = {
     {
       id: 'mahmoud', group: 'member', name: 'Doodo', object: 'goggles', actor: 'swim', color: '#6fe9ff',
       media: [],
+      text: {
+        '01.jpg': "04/29/06 · Michigan & Cairo\n\nMr. Nonchalant, and the most athletic of the group. A Division II All-American swimmer and a future AI guru: serious, with a taste of stupidity. Come to be inspired and to laugh, all at once.\n\n— Mahmoud El Walid",
+      },
     },
     {
       id: 'muhammad', group: 'member', name: 'Dodo', object: 'drawing', actor: 'draw', color: '#a9c8ff',
       media: [],
+      text: {
+        '01.mp4': "08/08/06 · Brighton & Cairo\n\nArchitect, entrepreneur, visionary, and proudly an “idiot.” The most electric, outgoing and funniest of the pride. Follow Dodo’s adventures for a laugh you won’t want to miss.\n\n— Muhammad Nada",
+      },
     },
     {
       id: 'tareq', group: 'member', name: 'Teeka', object: 'gloves', actor: 'box', color: '#ff8f8f',
       media: [],
+      text: {
+        '01.jpg': "02/01/06\n\nA true rags-to-riches story: he knocked himself down and came back better than ever. Willpower and grit like no other, and as real as they come. A fine linguist; you will never beat him with words. Funny, with a hint of psycho. Follow Teeka, but don’t cross him. You don’t want to see the other side.",
+      },
     },
     {
       id: 'belal', group: 'member', name: 'Nosseir', object: 'angel', actor: 'mac', color: '#ffb3e6',
       media: [],
+      text: {
+        '01.jpg': "12/31/04\n\nThe entrepreneur: businessman, e-commerce, and the most effortless athlete you’ll ever meet. As fun and loyal as they come, always a step ahead with his eyes on the prize. Ruthless, with a big heart. Watch and learn, ladies and gentlemen.",
+      },
     },
     {
       id: 'ibrahim', group: 'member', name: 'Hemi', object: 'hemi', actor: 'bench', color: '#ffbe6b',
       media: [],
+      text: {
+        '01.mp4': "08/06/06\n\nThe big one, the one who holds them together. Strength, endurance and intellect. He’ll find a solution to any problem, make you laugh until it hurts, and follow you to the grave if he has to.",
+      },
     },
     {
       id: 'bilal', group: 'member', name: 'Bilo', object: 'perfume', actor: 'spray', color: '#6fffc8',
       media: [],
+      text: {
+        '01.jpg': "02/27/06\n\nEnergy and discipline like no other, and fun like no other. Unmatched athleticism, charisma and intellect, carried by an infectious smile. The guy you want to be around, and the one who will never leave you when you’re in need.\n\n— Bilal Sultan",
+      },
     },
   ],
 };
