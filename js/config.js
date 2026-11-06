@@ -131,7 +131,7 @@ window.STAGE = {
       },
     },
     {
-      id: 'selim', group: 'member', name: 'Kika', object: 'huracan', color: '#2f6b4a',
+      id: 'selim', group: 'member', name: 'Kika', object: 'huracan', actor: 'coffee', color: '#2f6b4a',
       media: [],
     },
   ],

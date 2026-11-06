@@ -922,6 +922,138 @@
       };
       return g;
     },
+    // Kika: barista apron, pulling an espresso shot, then picking up the cup and taking a sip.
+    coffee(k) {
+      const { M, part } = k;
+      const g = new T.Group();
+      const f = figure(k, { top: '#f2f0ec', pants: '#2c2b2e', shoes: '#efefef', hair: '#16110d' });
+      const apron = M('#2f4a3c', { r: 0.8 });
+      f.spine.add(part(new T.BoxGeometry(0.3, 0.4, 0.02), apron, [0, 0.21, 0.104], [0.04, 0, 0]));
+      f.hips.add(part(new T.BoxGeometry(0.33, 0.38, 0.02), apron, [0, -0.14, 0.108], [-0.03, 0, 0]));
+      f.spine.add(part(new T.TorusGeometry(0.075, 0.008, 6, 20, Math.PI), apron, [0, 0.46, 0.06], [-0.6, 0, 0]));
+
+      // the station faces the camera; he stands at its right end, turned towards the group head
+      const st = new T.Group(); st.rotation.y = 0.35; g.add(st);
+      const steel = M('#d8dadc', { m: 1, r: 0.16 }), chrome = M('#eef0f2', { m: 1, r: 0.06 }), blk = M('#151517', { r: 0.45, cc: 0.4 });
+      const cream = M('#e7e1d6', { r: 0.3, cc: 0.8 }), wood = M('#7a553a', { r: 0.6, cc: 0.2 });
+      st.add(part(new T.BoxGeometry(0.66, 0.86, 0.48), wood, [0, 0.43, -0.04]));
+      st.add(part(new T.BoxGeometry(0.72, 0.04, 0.54), M('#f1efea', { r: 0.25, cc: 0.6 }), [0, 0.88, -0.04]));
+      const top = 0.9;
+      // machine: cream body, steel top and side trims, gauge, button
+      st.add(part(new T.BoxGeometry(0.4, 0.34, 0.28), cream, [0, top + 0.2, -0.12]));
+      st.add(part(new T.BoxGeometry(0.42, 0.04, 0.3), steel, [0, top + 0.02, -0.12]));
+      st.add(part(new T.BoxGeometry(0.42, 0.03, 0.3), steel, [0, top + 0.385, -0.12]));
+      for (const s of [-1, 1]) st.add(part(new T.CylinderGeometry(0.006, 0.006, 0.28, 8), chrome, [s * 0.19, top + 0.415, -0.12], [Math.PI / 2, 0, 0]));
+      for (let i = 0; i < 3; i++) st.add(part(new T.CylinderGeometry(0.026, 0.022, 0.045, 18), M('#f8f7f3', { r: 0.2, cc: 0.9 }), [-0.1 + i * 0.07, top + 0.423, -0.13]));
+      st.add(part(new T.CylinderGeometry(0.036, 0.036, 0.014, 24), chrome, [-0.1, top + 0.29, 0.025], [Math.PI / 2, 0, 0]));
+      st.add(part(new T.CircleGeometry(0.03, 24), M('#fbfaf6', { r: 0.3 }), [-0.1, top + 0.29, 0.033]));
+      st.add(part(new T.BoxGeometry(0.003, 0.024, 0.002), M('#c0392b'), [-0.1, top + 0.297, 0.035], [0, 0, -0.6]));
+      const btn = part(new T.CylinderGeometry(0.015, 0.015, 0.018, 16), blk, [0.1, top + 0.29, 0.026], [Math.PI / 2, 0, 0]); st.add(btn);
+      st.add(part(new T.SphereGeometry(0.006, 8, 6), M('#3ad06a', { r: 0.3 }), [0.14, top + 0.29, 0.024]));
+      // group head and portafilter
+      st.add(part(new T.BoxGeometry(0.07, 0.05, 0.08), chrome, [0, top + 0.2, 0.04]));
+      st.add(part(new T.CylinderGeometry(0.045, 0.05, 0.05, 24), chrome, [0, top + 0.165, 0.07]));
+      st.add(part(new T.CylinderGeometry(0.048, 0.04, 0.035, 24), chrome, [0, top + 0.125, 0.07]));
+      st.add(part(new T.CylinderGeometry(0.009, 0.012, 0.07, 10), chrome, [0, top + 0.128, 0.135], [Math.PI / 2 - 0.15, 0, 0]));
+      st.add(part(new T.CylinderGeometry(0.016, 0.012, 0.12, 14), blk, [0, top + 0.14, 0.225], [Math.PI / 2 - 0.15, 0, 0]));
+      for (const s of [-1, 1]) st.add(part(new T.CylinderGeometry(0.006, 0.004, 0.025, 8), chrome, [s * 0.012, top + 0.097, 0.07]));
+      // drip tray, steam wand, grinder
+      st.add(part(new T.BoxGeometry(0.36, 0.03, 0.15), steel, [0, top + 0.015, 0.09]));
+      for (let i = 0; i < 6; i++) st.add(part(new T.BoxGeometry(0.32, 0.003, 0.007), M('#7d8287', { m: 1, r: 0.4 }), [0, top + 0.031, 0.04 + i * 0.021]));
+      st.add(part(new T.CylinderGeometry(0.006, 0.006, 0.22, 8), chrome, [0.17, top + 0.17, 0.04], [0.3, 0, 0.12]));
+      st.add(part(new T.SphereGeometry(0.014, 10, 8), blk, [0.165, top + 0.3, 0.005]));
+      st.add(part(new T.BoxGeometry(0.12, 0.2, 0.14), blk, [-0.29, top + 0.1, -0.08]));
+      st.add(part(new T.CylinderGeometry(0.065, 0.03, 0.12, 20), M('#cfc6b8', { r: 0.1, cc: 1 }), [-0.29, top + 0.26, -0.08]));
+      st.add(part(new T.CylinderGeometry(0.055, 0.055, 0.03, 20), M('#3b2417', { r: 0.9 }), [-0.29, top + 0.29, -0.08]));
+
+      st.updateMatrixWorld(true);
+      const at = (x, y, z) => V(x, y, z).applyMatrix4(st.matrix);
+      const tray = at(0, top + 0.035, 0.07), spout = at(0, top + 0.085, 0.07), press = at(0.1, top + 0.29, 0.05), counter = at(0.27, top + 0.0, 0.17);
+      const a = Math.atan2(spout.x - 0.58, spout.z + 0.06);
+      f.root.position.set(0.58, 0, -0.06); f.root.rotation.y = a; g.add(f.root);
+
+      // the cup (kept upright, on the tray or in his hand), saucer, stream, crema, steam
+      const cup = new T.Group(); cup.scale.setScalar(1.5); g.add(cup);
+      const white = M('#f6f4ef', { r: 0.18, cc: 0.9 });
+      cup.add(part(new T.CylinderGeometry(0.034, 0.024, 0.05, 24, 1, true), M('#f6f4ef', { r: 0.18, cc: 0.9, ds: true }), [0, 0.025, 0]));
+      cup.add(part(new T.CylinderGeometry(0.024, 0.024, 0.004, 24), white, [0, 0.002, 0]));
+      const handle = part(new T.TorusGeometry(0.014, 0.004, 8, 16), white, [0, 0.028, 0.038], [0, Math.PI / 2, 0.2]); cup.add(handle);
+      const coffee = part(new T.CircleGeometry(0.031, 24), M('#6b3d1f', { r: 0.35 }), [0, 0.01, 0], [-Math.PI / 2, 0, 0]); cup.add(coffee);
+      g.add(part(new T.CylinderGeometry(0.085, 0.065, 0.01, 28), white, [tray.x, tray.y - 0.002, tray.z]));
+      const stream = part(new T.CylinderGeometry(0.0035, 0.0035, 1, 8), M('#5a3016', { r: 0.3 })); g.add(stream);
+      const steam = [];
+      for (let i = 0; i < 12; i++) {
+        const m = new T.Mesh(new T.SphereGeometry(0.018, 10, 8), new T.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0, depthWrite: false }));
+        m.userData.s = [Math.random() - 0.5, Math.random() - 0.5, i / 12]; g.add(m); steam.push(m);
+      }
+
+      // two-bone reach: point arm i's hand (palm centre) at p, given in g space
+      const L1 = 0.29, L2 = 0.31, tmp = V(0, 0, 0), q = new T.Quaternion();
+      const reach = (i, p) => {
+        f.spine.updateMatrixWorld(true);
+        const d = f.spine.worldToLocal(g.localToWorld(tmp.copy(p))).sub(f.sh[i].position);
+        const dist = Math.min(d.length(), L1 + L2 - 0.005);
+        const bend = Math.PI - Math.acos((L1 * L1 + L2 * L2 - dist * dist) / (2 * L1 * L2));
+        f.el[i].rotation.set(-bend, 0, 0);
+        const h0 = V(0, -L1 - L2 * Math.cos(bend), L2 * Math.sin(bend)).normalize();
+        f.sh[i].quaternion.copy(q.setFromUnitVectors(h0, d.normalize()));
+      };
+      const head = V(0, 0, 0), restQ = new T.Quaternion().setFromEuler(new T.Euler(0.06, 0, 0.1));
+      const fwd = V(Math.sin(a), 0, Math.cos(a)), across = V(Math.cos(a), 0, -Math.sin(a));
+      const Pp = V(0, 0, 0), Ph = V(0, 0, 0);
+      const mix = (A, B, u) => Pp.lerpVectors(A, B, ease(u));
+      const period = 9;
+      g.userData.tick = (t) => {
+        const ph = (t % period) / period, seg = (a0, a1) => Math.min(1, Math.max(0, (ph - a0) / (a1 - a0)));
+        const watch = ph > 0.14 && ph < 0.5, sipping = ph > 0.66 && ph < 0.8;
+        f.spine.rotation.set(watch ? 0.1 : 0.05, 0, 0);
+        f.head.rotation.set(sipping ? -0.3 : watch ? 0.3 : 0.08, 0, 0);
+        f.root.updateMatrixWorld(true); f.root.updateMatrix();
+        f.head.updateMatrixWorld(true);
+        g.worldToLocal(f.head.localToWorld(head.set(0, 0.05, 0.16)));
+        const cupHold = V(0, -0.1, 0).add(head).addScaledVector(fwd, -0.01);
+        const held = tray.clone().add(V(0, 0.045, 0)).addScaledVector(across, 0.07);
+        const sipP = cupHold.clone().add(V(0, 0.045, 0)).addScaledVector(across, 0.07);
+        // left hand (nearest the camera) presses the button, then takes the cup and sips
+        // (from the hanging rest pose, the arm blends into the reach)
+        let p, k = 1;
+        if (ph < 0.07) { p = press; k = ease(seg(0, 0.07)); }
+        else if (ph < 0.13) { p = press; k = 1 - ease(seg(0.07, 0.13)); }
+        else if (ph < 0.5) { p = press; k = 0; }
+        else if (ph < 0.57) { p = held; k = ease(seg(0.5, 0.57)); }
+        else if (ph < 0.66) p = mix(held, sipP, seg(0.57, 0.66));
+        else if (ph < 0.8) p = sipP;
+        else if (ph < 0.88) p = mix(sipP, held, seg(0.8, 0.88));
+        else { p = held; k = 1 - ease(seg(0.88, 1)); }
+        reach(1, p);
+        f.sh[1].quaternion.slerpQuaternions(restQ, f.sh[1].quaternion.clone(), k);
+        f.el[1].rotation.x = lerp(-0.12, f.el[1].rotation.x, k);
+        reach(0, counter);
+        btn.position.z = 0.026 - (ph > 0.055 && ph < 0.085 ? 0.007 : 0);
+        // cup follows the hand between pick-up and set-down
+        let w = 0;
+        if (ph >= 0.57 && ph < 0.88) w = 1;
+        g.updateMatrixWorld(true);
+        g.worldToLocal(f.hand[1].localToWorld(Ph.set(0, -0.04, 0)));
+        if (w) cup.position.copy(Ph).add(V(0, -0.045, 0)).addScaledVector(across, -0.07); else cup.position.copy(tray);
+        const tip = sipping ? Math.sin(Math.min(1, seg(0.66, 0.72) * 1) * Math.PI / 2) * 0.7 * (1 - seg(0.76, 0.8)) : 0;
+        cup.quaternion.setFromAxisAngle(across, -tip);
+        cup.rotateY(a + Math.PI / 2);
+        // stream and fill
+        const pour = ph > 0.1 && ph < 0.42;
+        stream.visible = pour;
+        if (pour) { const len = spout.y - (tray.y + 0.012); stream.scale.set(0.8 + 0.3 * Math.sin(t * 30), len, 1); stream.position.set(spout.x, spout.y - len / 2, spout.z); }
+        const lvl = ph < 0.1 ? 0 : ph < 0.42 ? seg(0.1, 0.42) : ph < 0.7 ? 1 : ph < 0.8 ? 1 - seg(0.7, 0.8) * 0.9 : 0.1 * (1 - seg(0.88, 1));
+        coffee.visible = lvl > 0.02; coffee.position.y = 0.006 + lvl * 0.036; coffee.scale.setScalar(0.78 + lvl * 0.22);
+        steam.forEach((m) => {
+          const s = m.userData.s, age = (t * 0.45 + s[2]) % 1, on = lvl > 0.3 && !sipping;
+          m.visible = on; if (!on) return;
+          m.position.set(cup.position.x + s[0] * 0.03 + Math.sin(t * 2 + s[2] * 9) * 0.01 * age, cup.position.y + 0.05 + age * 0.22, cup.position.z + s[1] * 0.03);
+          m.scale.setScalar(0.5 + age * 1.8); m.material.opacity = 0.35 * (1 - age) * Math.min(1, lvl);
+        });
+      };
+      return g;
+    },
   };
   // material with maps, outside kit() destructuring for the drafting paper
   const MT2 = (k, o) => k.MT(o);
