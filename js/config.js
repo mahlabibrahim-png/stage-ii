@@ -35,6 +35,7 @@ window.STAGE = {
         '06.jpg': "27.4283° N, 33.6581° E · August 2025\n\nA ring of villas around its own quiet lagoon, the Red Sea waiting just beyond.",
         '07.mp4': "~27.43° N, 33.66° E · August 2025\n\nGliding low over the water as the day softens into evening.",
         '08.mp4': "~27.48° N, 33.92° E · July 2026\n\nTurquoise shallows against bare desert rock: a wild stretch of coast we had entirely to ourselves.",
+        '09.mp4': "~27.40° N, 33.67° E · June 2025\n\nThe whole crew aboard, tracing a clean line of white across the lagoon.",
       },
     },
     {
