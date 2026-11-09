@@ -97,7 +97,7 @@ window.STAGE = {
       id: 'muhammad', group: 'member', name: 'Dodo', object: 'drawing', actor: 'draw', color: '#a9c8ff',
       media: [],
       text: {
-        '01.mp4': "~27.40° N, 33.67° E · December 2024\n\n08/08/06 · Brighton & Cairo\n\nArchitect, entrepreneur, visionary, and proudly an “idiot.” The most electric, outgoing and funniest of the pride. Follow Dodo’s adventures for a laugh you won’t want to miss.\n\n— M.N",
+        '01.mp4': "~27.40° N, 33.67° E · December 2024\n\n08/08/06 · Brighton & Cairo\n\nArchitect, entrepreneur, visionary, and a joker at heart. The most electric, outgoing and funniest of the pride. Follow Dodo’s adventures for a laugh you won’t want to miss.\n\n— M.N",
         '02.mp4': "~27.48° N, 33.92° E · June 2026\n\nClimbing aboard from the crystal shallows.",
         '03.mp4': "~27.40° N, 33.67° E · June 2026\n\nA crab caught by hand, and presented with great pride.",
         '04.jpg': "~27.40° N, 33.67° E · July 2026\n\nVictory, for reasons unknown.",
